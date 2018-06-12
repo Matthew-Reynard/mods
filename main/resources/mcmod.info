@@ -1,0 +1,16 @@
+[
+{
+  "modid": "testmod",
+  "name": "Test Mod",
+  "description": "A test mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["MReynard24"],
+  "credits": "Loremaster for the YT vid",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
