@@ -30,10 +30,6 @@ public class Server extends Thread {
 	public void run() {
 		String fromClient;
 		
-//		int port = 5555;
-		
-//		ServerSocket server;
-		
 		try {
 			server = new ServerSocket(port);
 		
@@ -61,7 +57,6 @@ public class Server extends Thread {
 					synchronized (mc){
 		        		System.out.println("Thread is still running");
 		        		mc.notifyAll();
-		        		
 		        	}
 					
 					System.out.println("Send from server to clients - the state");
@@ -80,10 +75,10 @@ public class Server extends Thread {
 				}
 			}
 			
-			// close the server
-//			server.close();
-			
+			// Close the client
 			outFromServer.writeUTF(closeClient());
+			
+			// Close the server
 			connected.close();
 			end();
 			
@@ -109,6 +104,7 @@ public class Server extends Thread {
 		return action;
 	}
 	
+	// NOT USED
 	public static void send() {
 		
 		System.out.println("Sending state...");
@@ -130,6 +126,8 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	//Close the python client safely
 	public String closeClient() {
 		String close = "[close]";
 		return close;

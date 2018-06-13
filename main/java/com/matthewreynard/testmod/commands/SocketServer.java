@@ -27,20 +27,18 @@ public class SocketServer implements ICommand {
 
 	@Override
 	public String getName() {
-		
 		return "server";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender) {
-		
 		return "server <args> (start, stop)";
 	}
 
 	@Override
 	public List<String> getAliases() {
 		List<String> commandAliases = new ArrayList();
-		commandAliases.add("myserver");
+		commandAliases.add("s");
 		commandAliases.add("socket");
 		return commandAliases;
 	}
@@ -54,8 +52,6 @@ public class SocketServer implements ICommand {
 			Style style = new Style();
 			style.setColor(TextFormatting.BLUE);
 			msg.setStyle(style);
-
-//			Server s = new Server();
 			
 			if (args.length == 0) {
 				player.sendMessage(msg.appendText("start or stop ???"));
@@ -91,9 +87,5 @@ public class SocketServer implements ICommand {
 	public Server getServer() {
 		return s;
 	}
-	
-//	public Server setServer() {
-//		return s;
-//	}
 
 }
