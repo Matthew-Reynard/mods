@@ -9,6 +9,12 @@ import java.net.Socket;
 
 import java.util.Arrays;
 
+import com.matthewreynard.testmod.events.TestEventHandler;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+
 public class Server extends Thread {
 	
 	public static boolean open = false;
@@ -16,6 +22,8 @@ public class Server extends Thread {
 	public static int action;
 	
 	public static int port = 5555;
+	
+	public static Object mc;
 	
 	public static ServerSocket server;
 	
@@ -49,6 +57,13 @@ public class Server extends Thread {
 					break;
 				}
 				else if(fromClient.equals("p")) {
+					
+					synchronized (mc){
+		        		System.out.println("Thread is still running");
+		        		mc.notifyAll();
+		        		
+		        	}
+					
 					System.out.println("Send from server to clients - the state");
 //						outFromServer.writeUTF("State = 1");
 					outFromServer.writeUTF(Arrays.toString(state));
@@ -67,6 +82,8 @@ public class Server extends Thread {
 			
 			// close the server
 //			server.close();
+			
+			outFromServer.writeUTF(closeClient());
 			connected.close();
 			end();
 			
@@ -113,4 +130,13 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 	}
+	public String closeClient() {
+		String close = "[close]";
+		return close;
+	}
+	
+	public void setmcServer(Object s) {
+		mc = s;
+	}
+	
 }

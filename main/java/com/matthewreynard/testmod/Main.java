@@ -2,9 +2,11 @@ package com.matthewreynard.testmod;
 
 import org.lwjgl.input.Keyboard;
 
+import com.matthewreynard.testmod.commands.SocketServer;
 import com.matthewreynard.testmod.events.Keybinds;
 import com.matthewreynard.testmod.events.TestEventHandler;
 import com.matthewreynard.testmod.events.TestFMLEventHandler;
+import com.matthewreynard.testmod.network.Server;
 import com.matthewreynard.testmod.proxy.CommonProxy;
 import com.matthewreynard.testmod.util.Reference;
 
@@ -19,9 +21,15 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.NAME, version = Reference.VERSION)
 public class Main {
+	
+//	Server s;
+	static SocketServer s;
+	
+	static TestEventHandler teh;
 	
 	@Instance
 	public static Main instance;
@@ -37,14 +45,28 @@ public class Main {
 	@EventHandler
 	public static void init(FMLInitializationEvent event) {
 		
+		System.out.println("My mod has been initialized.");
+		
 	}
 	
 	@EventHandler
 	public static void PostInit(FMLPostInitializationEvent event) {
 		
-		MinecraftForge.EVENT_BUS.register(new TestEventHandler());
+		teh = new TestEventHandler();
+		
+		MinecraftForge.EVENT_BUS.register(teh);
 		
 //		FMLCommonHandler.instance().bus().register(new TestFMLEventHandler());
+	}
+	
+	// Commands
+	@EventHandler
+	public void serverLoad(FMLServerStartingEvent event) {
+		s = new SocketServer();
+		
+		event.registerServerCommand(s);
+		
+		teh.getServer(s.getServer());
 	}
 
 }
