@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 public class Server extends Thread {
 	
 	public static boolean open = false;
-	public static float[] state;
+	public static float[] state = {0,0,0,0};
 	public static int action;
 	
 	public static int port = 5555;
@@ -26,6 +26,8 @@ public class Server extends Thread {
 	public static Object mc;
 	
 	public static ServerSocket server;
+	
+	public static boolean sendState = false;
 	
 	public void run() {
 		String fromClient;
@@ -44,35 +46,57 @@ public class Server extends Thread {
 			
 			open = true;
 			
-			while(open) {
-				fromClient = inFromClient.readLine();
+//			while(open) {
+//				fromClient = inFromClient.readLine();
+////					outFromServer.writeUTF(Arrays.toString(state));
+//				
+//				if(fromClient.equals("q") || fromClient.equals("Q")) {
+////					connected.close();
+//					break;
+//				}
+//				else if(fromClient.equals("p")) {
+//					
+////					synchronized (mc){
+////		        		System.out.println("Thread is still running");
+////		        		mc.notifyAll();
+////		        	}
+//					
+//					System.out.println("Send from server to clients - the state");
+////						outFromServer.writeUTF("State = 1");
 //					outFromServer.writeUTF(Arrays.toString(state));
+//					
+//					fromClient = inFromClient.readLine();
+//					
+//					System.out.println("Action: " + fromClient);
+//					if (!fromClient.startsWith("p")) {
+//						setAction(fromClient);							
+//					}
+//				}
+//				else {
+//					System.out.println("Recieved: " + fromClient);
+//				}
+//			}
+			
+			while(open) {
 				
-				if(fromClient.equals("q") || fromClient.equals("Q")) {
-//					connected.close();
-					break;
-				}
-				else if(fromClient.equals("p")) {
+//				fromClient = inFromClient.readLine();
+				
+//				if(fromClient.equals("p")) {
+				if(sendState) {
 					
-					synchronized (mc){
-		        		System.out.println("Thread is still running");
-		        		mc.notifyAll();
-		        	}
-					
-					System.out.println("Send from server to clients - the state");
-//						outFromServer.writeUTF("State = 1");
 					outFromServer.writeUTF(Arrays.toString(state));
+					
+					//Python decides action
 					
 					fromClient = inFromClient.readLine();
 					
-					System.out.println("Action: " + fromClient);
 					if (!fromClient.startsWith("p")) {
 						setAction(fromClient);							
 					}
+					
+					sendState = false;
 				}
-				else {
-					System.out.println("Recieved: " + fromClient);
-				}
+				
 			}
 			
 			// Close the client
@@ -105,10 +129,10 @@ public class Server extends Thread {
 	}
 	
 	// NOT USED
-	public static void send() {
+	public static void sendState() {
 		
-		System.out.println("Sending state...");
-//		sent = true;
+//		System.out.println("Sending state...");
+		sendState = true;
 	}
 	
 	public void closeConnection() {

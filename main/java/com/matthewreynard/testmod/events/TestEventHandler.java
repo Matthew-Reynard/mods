@@ -29,6 +29,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
+import com.matthewreynard.testmod.actions.Actions;
 import com.matthewreynard.testmod.network.Server;
 import com.matthewreynard.testmod.tickrate.ChangeTickRate;
 
@@ -39,9 +40,10 @@ public class TestEventHandler {
 	public static boolean toggled = false;
 	public static boolean tickchange = false;
 	public static boolean waiting = false;
+	public static boolean isPerformingAction = false;
 	
 	public static int r = 0;
-	public static int action = 0;
+	public static int action = 100;
 	
 	public static int food_x = 0;
 	public static int food_z = 0;
@@ -53,26 +55,26 @@ public class TestEventHandler {
 	
 	public static Server server;
 	
-	@SubscribeEvent
-	public void test1(WorldTickEvent event)
-	{
-		if (toggled) {
-			server.setmcServer(this);
-			
-			if (waiting) {
-			
-				synchronized (this) {
-					try {
-						System.out.println("Thread is running");
-						wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
+//	@SubscribeEvent
+//	public void test1(WorldTickEvent event)
+//	{
+//		if (toggled) {
+//			server.setmcServer(this);
+//			
+//			if (waiting) {
+//			
+//				synchronized (this) {
+//					try {
+//						System.out.println("Thread is running");
+//						wait();
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	@SubscribeEvent
 	public void test(LivingUpdateEvent event)
@@ -84,12 +86,14 @@ public class TestEventHandler {
 			
 			Minecraft mc = Minecraft.getMinecraft();
 			
+			Actions act = new Actions(player);
+			
 			// Player is invincible
 			player.capabilities.disableDamage = true;
 			
-			if(!mc.world.isRemote && !waiting) {
-				System.out.println("It is not waiting...");
-			}
+//			if(!mc.world.isRemote && !waiting) {
+//				System.out.println("It is not waiting...");
+//			}
 			
 			if (toggled) {
 				
@@ -111,41 +115,27 @@ public class TestEventHandler {
 //						}
 //					}
 					
-					System.out.println("Exited the loop");
+//					System.out.println("Exited the loop");
 					
-//					r = rnd.nextInt(40);
-					action = Server.getAction();
-//					action = 5;
-					
-					if (player.world.isRemote) {
-						switch(action) {
-							case 0: //up
-								System.out.println("\nAction: "+r+" -> UP");
-//								player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
-								player.setVelocity(-0.05f, 0.0f, 0.0f);
-								break;
-							
-							case 1: //down
-								System.out.println("\nAction: "+r+" -> DOWN"); 
-//								player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
-								player.setVelocity(0.05f, 0.0f, 0.0f);
-								break;
-							
-							case 2: //left
-								System.out.println("\nAction: "+r+" -> LEFT");
-//								player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0f, player.rotationYaw, player.rotationPitch);
-								player.setVelocity(0.0f, 0.0f, -0.05f);
-								break;
-							
-							case 3: //right
-								System.out.println("\nAction: "+r+" -> RIGHT");
-//								player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0f, player.rotationYaw, player.rotationPitch);							
-								player.setVelocity(0.0f, 0.0f, 0.05f);
-								break;
-							
-							default: 
-								System.out.println("Invalid action");
-						}
+					// If the agent is on the food block
+					if (Math.floor(player.posX) == food_x && Math.floor(player.posZ) == food_z) {
+						food_x = rnd.nextInt(10);
+			        	food_z = rnd.nextInt(10);
+			        	
+//			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+//			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+//			        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+//			        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+			        	
+			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
+			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
+			        	mc.world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
+			        	mc.world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
+			        	
+			        	
+			        	
+			        	prev_food_x = food_x;
+			        	prev_food_z = food_z;
 					}
 					
 					float[] x = new float[4];
@@ -157,24 +147,48 @@ public class TestEventHandler {
 					
 					Server.setState(x);
 					
-					if (Math.floor(player.posX) == food_x && Math.floor(player.posZ) == food_z) {
-						food_x = rnd.nextInt(10);
-			        	food_z = rnd.nextInt(10);
-			        	
-			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
-			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
-			        	
-//			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
-//			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
-			        	
-			        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-			        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
-			        	
-			        	prev_food_x = food_x;
-			        	prev_food_z = food_z;
+					if (!isPerformingAction) {
+						Server.sendState();
 					}
 					
+//					r = rnd.nextInt(40);
+					action = Server.getAction();
+//					action = 5;
 					
+					if (player.world.isRemote) {
+						switch(action) {
+							case 0: //up
+								System.out.println("\nAction: "+r+" -> UP");
+//								player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+//								player.setVelocity(-0.05f, 0.0f, 0.0f);
+								isPerformingAction = act.moveForward();
+								break;
+							
+							case 1: //down
+								System.out.println("\nAction: "+r+" -> DOWN"); 
+//								player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+//								player.setVelocity(0.05f, 0.0f, 0.0f);
+								isPerformingAction = act.moveBackward();
+								break;
+							
+							case 2: //left
+								System.out.println("\nAction: "+r+" -> LEFT");
+//								player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0f, player.rotationYaw, player.rotationPitch);
+//								player.setVelocity(0.0f, 0.0f, -0.05f);
+								isPerformingAction = act.moveLeft();
+								break;
+							
+							case 3: //right
+								System.out.println("\nAction: "+r+" -> RIGHT");
+//								player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0f, player.rotationYaw, player.rotationPitch);							
+//								player.setVelocity(0.0f, 0.0f, 0.05f);
+								isPerformingAction = act.moveRight();
+								break;
+							
+							default: 
+								System.out.println("Invalid action - do nothing");
+						}
+					}
 				}
 				
 				// Allow flight when toggled if hand is empty
@@ -255,16 +269,17 @@ public class TestEventHandler {
         	// Not used yet
 //        	Server.send();
         	
-        	IBlockState state_red = world.getBlockState(new BlockPos(0,99,0));
-        	IBlockState state_wood = world.getBlockState(new BlockPos(0,98,0));
+//        	IBlockState state_red = world.getBlockState(new BlockPos(0,99,0));
+//        	IBlockState state_wood = world.getBlockState(new BlockPos(0,98,0));
+//        	world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+//        	world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
         	
-//        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
-//        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
+        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
+        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
+        	world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
+        	world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
         	
 //        	world.setBlockToAir(new BlockPos(0,5,0));
-        	
-        	world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-        	world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
         	
         	prev_food_x = food_x;
         	prev_food_z = food_z;
