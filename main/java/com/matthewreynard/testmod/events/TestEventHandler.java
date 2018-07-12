@@ -43,7 +43,7 @@ public class TestEventHandler {
 	public static boolean isPerformingAction = false;
 	
 	public static int r = 0;
-	public static int action = 100;
+	public static int action = -1; // initialised to do nothing
 	
 	public static int food_x = 0;
 	public static int food_z = 0;
@@ -75,6 +75,12 @@ public class TestEventHandler {
 //			}
 //		}
 //	}
+	
+	/**
+	 * Main function to receive actions from python socket and execute an action every tick
+	 * In order to re-enable it, uncomment the @SubscribeEvent line above function
+	 * @param event
+	 */
 	
 	@SubscribeEvent
 	public void test(LivingUpdateEvent event)
@@ -122,15 +128,15 @@ public class TestEventHandler {
 						food_x = rnd.nextInt(10);
 			        	food_z = rnd.nextInt(10);
 			        	
-//			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
-//			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
-//			        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-//			        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+			        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+			        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
 			        	
-			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
-			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
-			        	mc.world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
-			        	mc.world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
+//			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
+//			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
+//			        	mc.world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
+//			        	mc.world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
 			        	
 			        	
 			        	
@@ -145,14 +151,16 @@ public class TestEventHandler {
 					x[2]= (float)food_z;
 					x[3]= (float)food_x;
 					
+					// Doesn't require the server to be running
 					Server.setState(x);
 					
 					if (!isPerformingAction) {
-						Server.sendState();
+//						Server.sendState();
+						action = -1;
 					}
 					
 //					r = rnd.nextInt(40);
-					action = Server.getAction();
+//					action = Server.getAction();
 //					action = 5;
 					
 					if (player.world.isRemote) {
@@ -184,6 +192,14 @@ public class TestEventHandler {
 //								player.setVelocity(0.0f, 0.0f, 0.05f);
 								isPerformingAction = act.moveRight();
 								break;
+								
+							case 4: //jump forward
+								System.out.println("\nAction: "+r+" -> JUMP FORWARD");
+//								System.out.println(player.onGround);
+//								player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0f, player.rotationYaw, player.rotationPitch);							
+//								player.setVelocity(0.0f, 0.0f, 0.05f);
+								isPerformingAction = act.jumpForward();
+								break;
 							
 							default: 
 								System.out.println("Invalid action - do nothing");
@@ -207,6 +223,15 @@ public class TestEventHandler {
 	}
 	
 	
+	/**
+	 * All key inputs function
+	 * 
+	 * All keys available for use in Minecraft (without changing the defaults):
+	 * R, Y, U, I, O, P, G, H, J, K, L, V, B, N, M, [, ], ;, ', ., /, -, =, Arrow Keys
+	 * 
+	 * @param event
+	 */
+	
 	@SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
 		
@@ -215,6 +240,7 @@ public class TestEventHandler {
 		World world = mc.world;
 		MinecraftServer mcServer = mc.player.getServer();
 		
+		Actions act = new Actions(player);
 		
 		// Setting the state of snake minecraft
 		float[] x = new float[4];
@@ -241,9 +267,9 @@ public class TestEventHandler {
         // KEY R
         if (Keybinds.print.isPressed())
         {
-        	waiting = !waiting;
+//        	waiting = !waiting;
         	
-        	System.out.println("Waiting " + waiting);
+//        	System.out.println("Waiting " + waiting);
         	
 //        	if(!world.isRemote) {
 //	        	try {
@@ -255,6 +281,16 @@ public class TestEventHandler {
 //        	else {
 //        		System.out.println("Integrated server is null");
 //        	}
+        	
+        	action = 4;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	
+//        	if (player.onGround) {
+////        		player.jump();
+//        		player.setVelocity(0, 0.6, 0);
+//        	}
+        	
         }
         
         // KEY B
@@ -269,15 +305,15 @@ public class TestEventHandler {
         	// Not used yet
 //        	Server.send();
         	
-//        	IBlockState state_red = world.getBlockState(new BlockPos(0,99,0));
-//        	IBlockState state_wood = world.getBlockState(new BlockPos(0,98,0));
-//        	world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-//        	world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+        	IBlockState state_red = world.getBlockState(new BlockPos(0,99,0));
+        	IBlockState state_wood = world.getBlockState(new BlockPos(0,98,0));
+        	world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+        	world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
         	
-        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
-        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
-        	world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
-        	world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
+//        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
+//        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
+//        	world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
+//        	world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
         	
 //        	world.setBlockToAir(new BlockPos(0,5,0));
         	
@@ -288,29 +324,53 @@ public class TestEventHandler {
         
         // Snake movements (ARROW KEYS)
         if (Keybinds.up.isPressed()) {
-			player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+//			player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+        	
+        	action = 0;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
 		}
 		else if (Keybinds.down.isPressed()) {
-			player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+//			player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+			
+			action = 1;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
 		}
 		else if (Keybinds.left.isPressed()) {
-			player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0, player.rotationYaw, player.rotationPitch);
+//			player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0, player.rotationYaw, player.rotationPitch);
+			
+			action = 2;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
 		}
 		else if (Keybinds.right.isPressed()) {
-			player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0, player.rotationYaw, player.rotationPitch);
+//			player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0, player.rotationYaw, player.rotationPitch);
+			
+			action = 3;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
 		}
+        
+        //Key L
+        
     }
 
+	/**
+	 * Super Jump if toggled
+	 * Just for fun :)
+	 * @param event
+	 */
 	
-	@SubscribeEvent
-	public void superJump(LivingJumpEvent event) {
-//		System.out.println("Some event called; is this the client side? " + event.getEntity().world.isRemote);
-		
-		if (event.getEntity() instanceof EntityPlayer && toggled) {
-			EntityPlayer player = (EntityPlayer) event.getEntity();
-			player.motionY += 1.2D;
-		}
-	}
+//	@SubscribeEvent
+//	public void superJump(LivingJumpEvent event) {
+////		System.out.println("Some event called; is this the client side? " + event.getEntity().world.isRemote);
+//		
+//		if (event.getEntity() instanceof EntityPlayer && toggled) {
+//			EntityPlayer player = (EntityPlayer) event.getEntity();
+//			player.motionY += 1.2D;
+//		}
+//	}
 	
 	/**Network event
 	 * 
