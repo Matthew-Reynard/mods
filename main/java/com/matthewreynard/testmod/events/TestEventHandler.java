@@ -6,6 +6,7 @@ import net.minecraft.client.settings.GameSettings.Options;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -195,10 +196,27 @@ public class TestEventHandler {
 								
 							case 4: //jump forward
 								System.out.println("\nAction: "+r+" -> JUMP FORWARD");
-//								System.out.println(player.onGround);
-//								player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0f, player.rotationYaw, player.rotationPitch);							
-//								player.setVelocity(0.0f, 0.0f, 0.05f);
 								isPerformingAction = act.jumpForward();
+								break;
+								
+							case 5: //break block forward
+								System.out.println("\nAction: "+r+" -> BREAK BLOCK FORWARD");
+								isPerformingAction = act.breakBlock();
+								break;
+								
+							case 6: //place block forward
+								System.out.println("\nAction: "+r+" -> PLACE BLOCK FORWARD");
+								isPerformingAction = act.placeBlock();
+								break;
+							
+							case 7: //look left
+								System.out.println("\nAction: "+r+" -> LOOK LEFT");
+								isPerformingAction = act.lookLeft();
+								break;
+								
+							case 8: //look right
+								System.out.println("\nAction: "+r+" -> LOOK RIGHT");
+								isPerformingAction = act.lookRight();
 								break;
 							
 							default: 
@@ -282,14 +300,12 @@ public class TestEventHandler {
 //        		System.out.println("Integrated server is null");
 //        	}
         	
-        	action = 4;
+        	action = 7;
         	isPerformingAction = true;
-        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         	
-//        	if (player.onGround) {
-////        		player.jump();
-//        		player.setVelocity(0, 0.6, 0);
-//        	}
+//        	player.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw + 10, player.rotationPitch);
         	
         }
         
@@ -340,16 +356,26 @@ public class TestEventHandler {
 		else if (Keybinds.left.isPressed()) {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0, player.rotationYaw, player.rotationPitch);
 			
-			action = 2;
+//			action = 2;
+//        	isPerformingAction = true;
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	
+        	action = 7;
         	isPerformingAction = true;
-        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
 		else if (Keybinds.right.isPressed()) {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0, player.rotationYaw, player.rotationPitch);
 			
-			action = 3;
+//			action = 3;
+//        	isPerformingAction = true;
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	
+        	action = 8;
         	isPerformingAction = true;
-        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
         
         //Key L
