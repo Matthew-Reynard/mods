@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 
 public class Actions {
 	
@@ -111,13 +113,22 @@ public class Actions {
 	public boolean breakBlock() {
 		
 		Minecraft mc = Minecraft.getMinecraft();
+		mc.skipRenderWorld = true;
+		
+		Vec3d posVec = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+		Vec3d lookVec = player.getLookVec();
+		RayTraceResult rtr = mc.world.rayTraceBlocks(posVec, lookVec);
+		
+		System.out.println("blockpos: " + rtr.toString()); 
+		System.out.println(posVec); 
+		System.out.println(lookVec);
 		
 		// For the animation
 		player.swingArm(EnumHand.MAIN_HAND);
     	
 		// Destroy the block and drop it on ground
 		player.getEntityWorld().destroyBlock(new BlockPos(player.posX + 1.0, player.posY, player.posZ), true);
-    	mc.getIntegratedServer().getEntityWorld().destroyBlock(new BlockPos(player.posX + 1.0, player.posY, player.posZ), true);
+    	mc.getIntegratedServer().getEntityWorld().destroyBlock(new BlockPos(player.posX + 1.0, player.posY, player.posZ), false);
     	
     	//Set that block to air
     	player.getEntityWorld().setBlockToAir(new BlockPos(player.posX + 1.0, player.posY, player.posZ));
@@ -131,6 +142,7 @@ public class Actions {
 	public boolean placeBlock() {
 		
 		Minecraft mc = Minecraft.getMinecraft();
+		mc.skipRenderWorld = false;
 		BlockPos blockpos = new BlockPos(player.posX + 1.0, player.posY, player.posZ);
 		
 		// For the animation
@@ -184,4 +196,62 @@ public class Actions {
 		return !actionComplete;
 	}
 	
+	public boolean lookUp() {
+		
+		player.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch - 15);
+		
+		actionComplete = true;
+		
+		return !actionComplete;
+	}
+	
+	public boolean lookDown() {
+		
+		player.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch + 15);
+		
+		actionComplete = true;
+		
+		return !actionComplete;
+	}
+	
+	public boolean jumpAndPlaceBlock() {
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		BlockPos blockpos = new BlockPos(startXpos, startYpos, startZpos);
+		
+		player.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch + 180);
+    	
+		// Get item from main hand
+		Item myItem = player.getHeldItemMainhand().getItem();
+		
+		if (player.onGround && player.posY == startYpos) {
+			player.jump();
+			actionComplete = false;
+		}
+		// Check if the block can be placed, then place whatever block is in main hand and subtract stack by 1
+		else if (player.posY >= startYpos + 1.0 && Block.getBlockFromItem(myItem).canPlaceBlockAt(player.getEntityWorld(), blockpos)) {
+			
+			// For the animation
+			player.swingArm(EnumHand.MAIN_HAND);
+			
+			player.getEntityWorld().setBlockState(blockpos, Block.getBlockFromItem(myItem).getDefaultState());
+			mc.getIntegratedServer().getEntityWorld().setBlockState(blockpos, Block.getBlockFromItem(myItem).getDefaultState());
+	    	player.getHeldItemMainhand().splitStack(1);
+	    	
+	    	actionComplete = true;
+		}
+		
+		return !actionComplete;
+		
+	}
+
+	public boolean lookNorth() {
+		
+		player.setLocationAndAngles(player.posX, player.posY, player.posZ, -90, 0);
+		
+		actionComplete = true;
+		
+		return !actionComplete;
+	}
+
 }

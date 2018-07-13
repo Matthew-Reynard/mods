@@ -13,6 +13,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Util.EnumOS;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -56,6 +58,11 @@ public class TestEventHandler {
 	
 	public static Server server;
 	
+	//test
+	public static long startTime = 0;
+	public static long currentTime = 0;
+	public static long numOfTicks = 0;
+	
 //	@SubscribeEvent
 //	public void test1(WorldTickEvent event)
 //	{
@@ -95,6 +102,8 @@ public class TestEventHandler {
 			
 			Actions act = new Actions(player);
 			
+			ITextComponent msg = new TextComponentString("TPS: ");
+			
 			// Player is invincible
 			player.capabilities.disableDamage = true;
 			
@@ -104,8 +113,22 @@ public class TestEventHandler {
 			
 			if (toggled) {
 				
+				currentTime = System.currentTimeMillis();
+				
 				//24000 day-night cycle. 1 time measurement = 1 tick
 				if(mc.world.getWorldTime() % 1 == 0) {
+					
+					// Just to stop it from occurring twice
+					if (player.world.isRemote) {
+						numOfTicks++;
+					
+						if (currentTime - startTime >= 1000) {
+							System.out.println("TPS: " + numOfTicks + "           World time: " + mc.world.getWorldTime());
+							player.sendMessage(msg.appendText(Long.toString(numOfTicks)));
+							numOfTicks = 0;
+							startTime = System.currentTimeMillis();
+						}
+					}
 					
 //					server.setmcServer(this);
 //					
@@ -209,18 +232,38 @@ public class TestEventHandler {
 								isPerformingAction = act.placeBlock();
 								break;
 							
-							case 7: //look left
+							case 7: //look up
+								System.out.println("\nAction: "+r+" -> LOOK UP");
+								isPerformingAction = act.lookUp();
+								break;
+								
+							case 8: //look down
+								System.out.println("\nAction: "+r+" -> LOOK DOWN");
+								isPerformingAction = act.lookDown();
+								break;
+							
+							case 9: //look left
 								System.out.println("\nAction: "+r+" -> LOOK LEFT");
 								isPerformingAction = act.lookLeft();
 								break;
 								
-							case 8: //look right
+							case 10: //look right
 								System.out.println("\nAction: "+r+" -> LOOK RIGHT");
 								isPerformingAction = act.lookRight();
 								break;
+								
+							case 11: //jump and place block below
+								System.out.println("\nAction: "+r+" -> JUMP AND PLACE");
+								isPerformingAction = act.jumpAndPlaceBlock();
+								break;
+								
+							case 12: //look north
+								System.out.println("\nAction: "+r+" -> LOOK NORTH");
+								isPerformingAction = act.lookNorth();
+								break;
 							
 							default: 
-								System.out.println("Invalid action - do nothing");
+//								System.out.println("Invalid action - do nothing");
 						}
 					}
 				}
@@ -244,8 +287,12 @@ public class TestEventHandler {
 	/**
 	 * All key inputs function
 	 * 
+	 * Keys used:
+	 * W, A, S, D, Space, Ctrl, Shift, Tab, Q, E, T, F, X, C, L, 1-9, ~, F1-F12 
+	 * 
+	 * 
 	 * All keys available for use in Minecraft (without changing the defaults):
-	 * R, Y, U, I, O, P, G, H, J, K, L, V, B, N, M, [, ], ;, ', ., /, -, =, Arrow Keys
+	 * Z, R, Y, U, I, O, P, G, H, J, K, V, B, N, M, [, ], ;, ', ., /, -, =, Arrow Keys
 	 * 
 	 * @param event
 	 */
@@ -280,6 +327,8 @@ public class TestEventHandler {
         		Minecraft.getMinecraft().player.sendChatMessage("Mod OFF");
         	}
         	
+        	startTime = System.currentTimeMillis();
+        	numOfTicks = 0;
         }    	
         
         // KEY R
@@ -300,12 +349,10 @@ public class TestEventHandler {
 //        		System.out.println("Integrated server is null");
 //        	}
         	
-        	action = 7;
+        	action = 11;
         	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
-        	
-//        	player.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw + 10, player.rotationPitch);
         	
         }
         
@@ -331,55 +378,107 @@ public class TestEventHandler {
 //        	world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
 //        	world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
         	
-//        	world.setBlockToAir(new BlockPos(0,5,0));
-        	
         	prev_food_x = food_x;
         	prev_food_z = food_z;
         	
         }
         
-        // Snake movements (ARROW KEYS)
+        // Looking
         if (Keybinds.up.isPressed()) {
 //			player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
         	
-        	action = 0;
+        	action = 7;
         	isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
 		else if (Keybinds.down.isPressed()) {
 //			player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
 			
-			action = 1;
+        	action = 8;
         	isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
 		else if (Keybinds.left.isPressed()) {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0, player.rotationYaw, player.rotationPitch);
 			
-//			action = 2;
-//        	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
-        	
-        	action = 7;
+//			
+        	action = 9;
         	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
 		else if (Keybinds.right.isPressed()) {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0, player.rotationYaw, player.rotationPitch);
 			
-//			action = 3;
-//        	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
-        	
-        	action = 8;
+        	action = 10;
         	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
         
-        //Key L
+        //Absolute Movement
         
+        // Key Y
+        if (Keybinds.north.isPressed()) {
+        	action = 0;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key H
+        else if (Keybinds.south.isPressed()) { // Key H
+        	action = 1;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key G
+        else if (Keybinds.west.isPressed()) {
+        	action = 2;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key J
+        else if (Keybinds.east.isPressed()) {
+        	action = 3;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key M
+        else if (Keybinds.jumpForward.isPressed()) {
+        	action = 4;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        
+        //Other actions
+        
+        // Key U
+        if (Keybinds.breakBlock.isPressed()) {
+        	action = 5;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key I
+        else if (Keybinds.placeBlock.isPressed()) {
+        	action = 6;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
+        // Key N
+        else if (Keybinds.reset.isPressed()) {
+        	action = 12;
+        	isPerformingAction = true;
+        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+        }
     }
 
 	/**
