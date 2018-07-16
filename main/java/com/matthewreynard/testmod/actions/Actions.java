@@ -113,26 +113,30 @@ public class Actions {
 	public boolean breakBlock() {
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.skipRenderWorld = true;
+//		mc.skipRenderWorld = true;
 		
-		Vec3d posVec = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-		Vec3d lookVec = player.getLookVec();
-		RayTraceResult rtr = mc.world.rayTraceBlocks(posVec, lookVec);
+//		Vec3d posVec = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+//		Vec3d lookVec = player.getLookVec();
+//		RayTraceResult rtr = mc.world.rayTraceBlocks(posVec, lookVec);
 		
-		System.out.println("blockpos: " + rtr.toString()); 
-		System.out.println(posVec); 
-		System.out.println(lookVec);
+		RayTraceResult rtr = player.rayTrace(4, 1); 
+		
+		BlockPos blockpos = new BlockPos(rtr.getBlockPos().getX(), rtr.getBlockPos().getY(), rtr.getBlockPos().getZ());
+		
+//		System.out.println("blockpos: " + rtr.toString()); 
+//		System.out.println(posVec); 
+//		System.out.println(lookVec);
 		
 		// For the animation
 		player.swingArm(EnumHand.MAIN_HAND);
     	
 		// Destroy the block and drop it on ground
-		player.getEntityWorld().destroyBlock(new BlockPos(player.posX + 1.0, player.posY, player.posZ), true);
-    	mc.getIntegratedServer().getEntityWorld().destroyBlock(new BlockPos(player.posX + 1.0, player.posY, player.posZ), false);
+		player.getEntityWorld().destroyBlock(blockpos, true);
+    	mc.getIntegratedServer().getEntityWorld().destroyBlock(blockpos, false);
     	
     	//Set that block to air
-    	player.getEntityWorld().setBlockToAir(new BlockPos(player.posX + 1.0, player.posY, player.posZ));
-    	mc.getIntegratedServer().getEntityWorld().setBlockToAir(new BlockPos(player.posX + 1.0, player.posY, player.posZ));
+    	player.getEntityWorld().setBlockToAir(blockpos);
+    	mc.getIntegratedServer().getEntityWorld().setBlockToAir(blockpos);
 		
     	actionComplete = true;
     	
@@ -142,8 +146,11 @@ public class Actions {
 	public boolean placeBlock() {
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.skipRenderWorld = false;
-		BlockPos blockpos = new BlockPos(player.posX + 1.0, player.posY, player.posZ);
+//		mc.skipRenderWorld = false;
+		
+		RayTraceResult rtr = player.rayTrace(4, 1); 
+		
+		BlockPos blockpos = new BlockPos(rtr.getBlockPos().getX(), rtr.getBlockPos().getY(), rtr.getBlockPos().getZ());
 		
 		// For the animation
 		player.swingArm(EnumHand.MAIN_HAND);

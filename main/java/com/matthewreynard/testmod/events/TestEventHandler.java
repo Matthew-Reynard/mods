@@ -119,16 +119,16 @@ public class TestEventHandler {
 				if(mc.world.getWorldTime() % 1 == 0) {
 					
 					// Just to stop it from occurring twice
-					if (player.world.isRemote) {
-						numOfTicks++;
-					
-						if (currentTime - startTime >= 1000) {
-							System.out.println("TPS: " + numOfTicks + "           World time: " + mc.world.getWorldTime());
-							player.sendMessage(msg.appendText(Long.toString(numOfTicks)));
-							numOfTicks = 0;
-							startTime = System.currentTimeMillis();
-						}
-					}
+//					if (player.world.isRemote) {
+//						numOfTicks++;
+//					
+//						if (currentTime - startTime >= 1000) {
+//							System.out.println("TPS: " + numOfTicks + "           World time: " + mc.world.getWorldTime());
+//							player.sendMessage(msg.appendText(Long.toString(numOfTicks)));
+//							numOfTicks = 0;
+//							startTime = System.currentTimeMillis();
+//						}
+//					}
 					
 //					server.setmcServer(this);
 //					
