@@ -30,6 +30,7 @@ public class Server extends Thread {
 	public static boolean sendState = false;
 	
 	public void run() {
+		
 		String fromClient;
 		
 		try {
@@ -48,6 +49,7 @@ public class Server extends Thread {
 			
 //			while(open) {
 //				fromClient = inFromClient.readLine();
+//				
 ////					outFromServer.writeUTF(Arrays.toString(state));
 //				
 //				if(fromClient.equals("q") || fromClient.equals("Q")) {
@@ -62,7 +64,6 @@ public class Server extends Thread {
 ////		        	}
 //					
 //					System.out.println("Send from server to clients - the state");
-////						outFromServer.writeUTF("State = 1");
 //					outFromServer.writeUTF(Arrays.toString(state));
 //					
 //					fromClient = inFromClient.readLine();
@@ -80,6 +81,20 @@ public class Server extends Thread {
 			while(open) {
 				
 //				fromClient = inFromClient.readLine();
+				
+				System.out.println("I'm here");
+				
+				try {
+					this.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				synchronized (mc) {
+//					System.out.println("Just before notify");
+					mc.notify();
+//					System.out.println("Just after notify");
+				}
 				
 //				if(fromClient.equals("p")) {
 				if(sendState) {

@@ -8,6 +8,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 public class Actions {
 	
@@ -123,10 +124,6 @@ public class Actions {
 		
 		BlockPos blockpos = new BlockPos(rtr.getBlockPos().getX(), rtr.getBlockPos().getY(), rtr.getBlockPos().getZ());
 		
-//		System.out.println("blockpos: " + rtr.toString()); 
-//		System.out.println(posVec); 
-//		System.out.println(lookVec);
-		
 		// For the animation
 		player.swingArm(EnumHand.MAIN_HAND);
     	
@@ -150,7 +147,11 @@ public class Actions {
 		
 		RayTraceResult rtr = player.rayTrace(4, 1); 
 		
-		BlockPos blockpos = new BlockPos(rtr.getBlockPos().getX(), rtr.getBlockPos().getY(), rtr.getBlockPos().getZ());
+		Vec3i offset = rtr.sideHit.getDirectionVec();
+		
+		BlockPos blockpos = new BlockPos(rtr.getBlockPos().getX() + offset.getX(), 
+				rtr.getBlockPos().getY() + offset.getY(), 
+				rtr.getBlockPos().getZ() + offset.getZ());
 		
 		// For the animation
 		player.swingArm(EnumHand.MAIN_HAND);
@@ -164,7 +165,7 @@ public class Actions {
 			
 			player.getEntityWorld().setBlockState(blockpos, Block.getBlockFromItem(myItem).getDefaultState());
 			mc.getIntegratedServer().getEntityWorld().setBlockState(blockpos, Block.getBlockFromItem(myItem).getDefaultState());
-	    	player.getHeldItemMainhand().splitStack(1);
+//			player.getHeldItemMainhand().splitStack(1); // Disabled for now
 	    	
 		}
 		

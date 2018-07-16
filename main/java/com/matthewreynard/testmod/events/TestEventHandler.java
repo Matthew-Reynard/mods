@@ -191,28 +191,24 @@ public class TestEventHandler {
 						switch(action) {
 							case 0: //up
 								System.out.println("\nAction: "+r+" -> UP");
-//								player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
 //								player.setVelocity(-0.05f, 0.0f, 0.0f);
 								isPerformingAction = act.moveForward();
 								break;
 							
 							case 1: //down
 								System.out.println("\nAction: "+r+" -> DOWN"); 
-//								player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
 //								player.setVelocity(0.05f, 0.0f, 0.0f);
 								isPerformingAction = act.moveBackward();
 								break;
 							
 							case 2: //left
 								System.out.println("\nAction: "+r+" -> LEFT");
-//								player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0f, player.rotationYaw, player.rotationPitch);
 //								player.setVelocity(0.0f, 0.0f, -0.05f);
 								isPerformingAction = act.moveLeft();
 								break;
 							
 							case 3: //right
-								System.out.println("\nAction: "+r+" -> RIGHT");
-//								player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0f, player.rotationYaw, player.rotationPitch);							
+								System.out.println("\nAction: "+r+" -> RIGHT");							
 //								player.setVelocity(0.0f, 0.0f, 0.05f);
 								isPerformingAction = act.moveRight();
 								break;
@@ -349,11 +345,32 @@ public class TestEventHandler {
 //        		System.out.println("Integrated server is null");
 //        	}
         	
-        	action = 11;
-        	isPerformingAction = true;
-        	act.setPlayerPos(player.posX, player.posY, player.posZ);
-        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
+//        	action = 11;
+//        	isPerformingAction = true;
+//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
+//        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         	
+//        	try {
+//				Thread.sleep(1,10);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+        	
+			server.setmcServer(mc.getIntegratedServer().getServerThread());
+			
+			synchronized (mc.getIntegratedServer().getServerThread()) {
+				try {
+					System.out.println("Waiting...");
+					
+					mc.getIntegratedServer().getServerThread().wait();
+					
+					System.out.println("Resumed...");
+					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+    		
         }
         
         // KEY B
@@ -481,6 +498,7 @@ public class TestEventHandler {
         }
     }
 
+	
 	/**
 	 * Super Jump if toggled
 	 * Just for fun :)
@@ -503,6 +521,7 @@ public class TestEventHandler {
 	 * 
 	 * @param event
 	 */
+	
 	@SubscribeEvent
     public void networkStuff(ServerConnectionFromClientEvent event)
     {
@@ -542,7 +561,7 @@ public class TestEventHandler {
  * 
  * PLAYER MOVEMENT:
  * player.travel(0.0f, 0.0f, 1.0f);
- * player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+ * player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch); // Teleport
  * player.moveRelative(-1.0f, 0, 0.0f, 0.5f);
  * player.turn(300, 0); // (0.15/360)*300
  * 
