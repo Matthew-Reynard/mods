@@ -33,10 +33,13 @@ import java.net.Socket;
 import java.util.Random;
 
 import com.matthewreynard.testmod.actions.Actions;
+import com.matthewreynard.testmod.network.MessageExplode;
+import com.matthewreynard.testmod.network.NetworkHandler;
 import com.matthewreynard.testmod.network.Server;
 import com.matthewreynard.testmod.tickrate.ChangeTickRate;
 
 import io.netty.channel.ChannelPipeline;
+import jline.internal.Log;
 
 public class TestEventHandler {
 	
@@ -63,10 +66,32 @@ public class TestEventHandler {
 	public static long currentTime = 0;
 	public static long numOfTicks = 0;
 	
-//	@SubscribeEvent
-//	public void test1(WorldTickEvent event)
-//	{
-//		if (toggled) {
+	/**
+	 * Called every tick
+	 * 
+	 * @param event
+	 */
+	
+	@SubscribeEvent
+	public void test1(WorldTickEvent event)
+	{
+		
+		if (waiting) {
+			
+			Log.info("Pressed R");
+
+			
+
+			NetworkHandler.sendToServer(new MessageExplode());
+			
+			try {
+				Minecraft.getMinecraft().wait(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			waiting = false;
+			
 //			server.setmcServer(this);
 //			
 //			if (waiting) {
@@ -81,8 +106,8 @@ public class TestEventHandler {
 //					}
 //				}
 //			}
-//		}
-//	}
+		}
+	}
 	
 	/**
 	 * Main function to receive actions from python socket and execute an action every tick
@@ -330,7 +355,7 @@ public class TestEventHandler {
         // KEY R
         if (Keybinds.print.isPressed())
         {
-//        	waiting = !waiting;
+        	waiting = !waiting;
         	
 //        	System.out.println("Waiting " + waiting);
         	
@@ -356,21 +381,21 @@ public class TestEventHandler {
 //				e.printStackTrace();
 //			}
         	
-			server.setmcServer(mc.getIntegratedServer().getServerThread());
-			
-			synchronized (mc.getIntegratedServer().getServerThread()) {
-				try {
-					System.out.println("Waiting...");
-					
-					mc.getIntegratedServer().getServerThread().wait();
-					
-					System.out.println("Resumed...");
-					
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-    		
+//			server.setmcServer(mc.getIntegratedServer().getServerThread());
+//			
+//			synchronized (mc.getIntegratedServer().getServerThread()) {
+//				try {
+//					System.out.println("Waiting...");
+//					
+//					mc.getIntegratedServer().getServerThread().wait();
+//					
+//					System.out.println("Resumed...");
+//					
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+        	
         }
         
         // KEY B

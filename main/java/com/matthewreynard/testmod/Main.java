@@ -6,10 +6,12 @@ import com.matthewreynard.testmod.commands.SocketServer;
 import com.matthewreynard.testmod.events.Keybinds;
 import com.matthewreynard.testmod.events.TestEventHandler;
 import com.matthewreynard.testmod.events.TestFMLEventHandler;
+import com.matthewreynard.testmod.network.NetworkHandler;
 import com.matthewreynard.testmod.network.Server;
 import com.matthewreynard.testmod.proxy.CommonProxy;
 import com.matthewreynard.testmod.util.Reference;
 
+import jline.internal.Log;
 //import net.java.games.input.Keyboard;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,13 +42,16 @@ public class Main {
 	@EventHandler
 	public static void PreInit(FMLPreInitializationEvent event) {
 		Keybinds.register();
+		NetworkHandler.init();
+		Log.info("Pre Initialization Complete!");
 	}
 	
 	@EventHandler
 	public static void init(FMLInitializationEvent event) {
 		
-		System.out.println("My mod has been initialized.");
+//		System.out.println("My mod has been initialized.");
 		
+		Log.info("Initialization Complete!");
 	}
 	
 	@EventHandler
@@ -57,6 +62,8 @@ public class Main {
 		MinecraftForge.EVENT_BUS.register(teh);
 		
 //		FMLCommonHandler.instance().bus().register(new TestFMLEventHandler());
+		
+		Log.info("Post Initialization Complete!");
 	}
 	
 	// Commands
