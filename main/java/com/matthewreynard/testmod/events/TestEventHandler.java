@@ -2,6 +2,7 @@ package com.matthewreynard.testmod.events;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings.Options;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.MoverType;
@@ -25,6 +26,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 //import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -80,15 +84,16 @@ public class TestEventHandler {
 			
 			Log.info("Pressed R");
 
-			
+			Minecraft mc = Minecraft.getMinecraft();
+			mc.skipRenderWorld = !mc.skipRenderWorld;
 
-			NetworkHandler.sendToServer(new MessageExplode());
+//			NetworkHandler.sendToServer(new MessageExplode());
 			
-			try {
-				Minecraft.getMinecraft().wait(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Minecraft.getMinecraft().wait(10);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 			
 			waiting = false;
 			

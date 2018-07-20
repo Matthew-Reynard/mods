@@ -1,5 +1,8 @@
 package com.matthewreynard.testmod.network;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -90,11 +93,19 @@ public class Server extends Thread {
 					e.printStackTrace();
 				}
 				
-				synchronized (mc) {
-//					System.out.println("Just before notify");
-					mc.notify();
-//					System.out.println("Just after notify");
+				try {
+					Robot r = new Robot();
+					r.keyPress(KeyEvent.VK_ESCAPE);
+					r.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
 				}
+				
+//				synchronized (mc) {
+////					System.out.println("Just before notify");
+//					mc.notify();
+////					System.out.println("Just after notify");
+//				}
 				
 //				if(fromClient.equals("p")) {
 				if(sendState) {
