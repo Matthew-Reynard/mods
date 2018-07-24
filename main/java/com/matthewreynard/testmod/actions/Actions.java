@@ -41,7 +41,7 @@ public class Actions {
 	public boolean moveForward() {
 		
 		double distanceToMove = 1 - (Math.abs(startXpos) % 1.0) + 0.3;
-		
+		actionComplete = false;
 		if (player.posX < startXpos + distanceToMove) {
 			player.setVelocity(0.06f, 0.0f, 0.0f);
 			actionComplete = false;
@@ -55,7 +55,7 @@ public class Actions {
 	public boolean moveBackward() {
 		
 		double distanceToMove = (Math.abs(startXpos) % 1.0) + 0.3;
-		
+		actionComplete = false;
 		if (player.posX > startXpos - distanceToMove) {
 			player.setVelocity(-0.06f, 0.0f, 0.0f);
 			actionComplete = false;
@@ -69,7 +69,7 @@ public class Actions {
 	public boolean moveLeft() {
 		
 		double distanceToMove = (Math.abs(startZpos) % 1.0) + 0.3;
-		
+		actionComplete = false;
 		if (player.posZ > startZpos - distanceToMove) {
 			player.setVelocity(0.0f, 0.0f, -0.06f);
 			actionComplete = false;
@@ -83,7 +83,7 @@ public class Actions {
 	public boolean moveRight() {
 		
 		double distanceToMove = 1 - (Math.abs(startZpos) % 1.0) + 0.3;
-		
+		actionComplete = false;
 		if (player.posZ < startZpos + distanceToMove) {
 			player.setVelocity(0.0f, 0.0f, 0.06f);
 			actionComplete = false;

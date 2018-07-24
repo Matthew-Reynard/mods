@@ -8,4 +8,8 @@ public class Reference {
 	public static final String ACCEPTED_VERSIONS = "[1.12.2]";
 	public static final String CLIENT_PROXY_CLASS = "com.matthewreynard.testmod.proxy.ClientProxy";
 	public static final String COMMON_PROXY_CLASS = "com.matthewreynard.testmod.proxy.CommonProxy";
+	
+	//Useful global variables
+	public static boolean isTraining = false;
+	public static boolean isSending = true;
 }
