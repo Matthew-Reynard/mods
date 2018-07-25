@@ -57,6 +57,8 @@ public class TestEventHandler {
 	public static int action = -1; // initialised to do nothing
 	public static int action1 = -1; // test variable
 	
+	public static boolean isActionComplete = false;
+	
 	public static int food_x = 0;
 	public static int food_z = 0;
 	
@@ -83,8 +85,8 @@ public class TestEventHandler {
 	@SubscribeEvent
 	public void worldTick(WorldTickEvent event)
 	{
-		
 		Minecraft mc = Minecraft.getMinecraft();
+		Actions act = new Actions(mc.player);
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
@@ -117,7 +119,10 @@ public class TestEventHandler {
 				Server.setState(state);
 				Server.setMinecraft(mc);
 				
-				Server.sendState();
+				synchronized(Server.lock) {
+					Server.sendState();
+					System.out.println("send it");
+				}
 				
 				try {
 					Log.info("PAUSE");
@@ -130,16 +135,102 @@ public class TestEventHandler {
 //				isPerformingAction = true;
 				Log.info("After pause");
 				
-				action = Server.getAction();
+//				synchronized (Server.actionLock) {
+					action = Server.getAction();
+//				}
 	
 				Log.info("Action: " + Integer.toString(action) + "\n");
 				
 				Reference.isSending = false;
+				isPerformingAction = true;
+				act.setPlayerPos(mc.player.posX, mc.player.posY, mc.player.posZ);
+	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
 			}
 			
-			if(action != -1) {
-				action = -1;
-//				isPerformingAction = false;
+			if(!mc.isGamePaused()) {
+				switch(action) {
+					case 1: //up
+						System.out.println("\nAction: "+action+" -> UP");
+	//					player.setVelocity(-0.05f, 0.0f, 0.0f);
+						isPerformingAction = act.moveForward();
+						break;
+					
+					case 0: //down
+						System.out.println("\nAction: "+action+" -> DOWN"); 
+	//					player.setVelocity(0.05f, 0.0f, 0.0f);
+						isPerformingAction = act.moveBackward();
+						break;
+					
+					case 2: //left
+						System.out.println("\nAction: "+action+" -> LEFT");
+	//					player.setVelocity(0.0f, 0.0f, -0.05f);
+						isPerformingAction = act.moveLeft();
+						break;
+					
+					case 3: //right
+						System.out.println("\nAction: "+action+" -> RIGHT");							
+	//					player.setVelocity(0.0f, 0.0f, 0.05f);
+						isPerformingAction = act.moveRight();
+						break;
+						
+					case 4: //jump forward
+						System.out.println("\nAction: "+action+" -> JUMP FORWARD");
+						isPerformingAction = act.jumpForward();
+						break;
+						
+					case 5: //break block forward
+						System.out.println("\nAction: "+action+" -> BREAK BLOCK FORWARD");
+						isPerformingAction = act.breakBlock();
+						break;
+						
+					case 6: //place block forward
+						System.out.println("\nAction: "+action+" -> PLACE BLOCK FORWARD");
+						isPerformingAction = act.placeBlock();
+						break;
+					
+					case 7: //look up
+						System.out.println("\nAction: "+action+" -> LOOK UP");
+						isPerformingAction = act.lookUp();
+						break;
+						
+					case 8: //look down
+						System.out.println("\nAction: "+action+" -> LOOK DOWN");
+						isPerformingAction = act.lookDown();
+						break;
+					
+					case 9: //look left
+						System.out.println("\nAction: "+action+" -> LOOK LEFT");
+						isPerformingAction = act.lookLeft();
+						break;
+						
+					case 10: //look right
+						System.out.println("\nAction: "+action+" -> LOOK RIGHT");
+						isPerformingAction = act.lookRight();
+						break;
+						
+					case 11: //jump and place block below
+						System.out.println("\nAction: "+action+" -> JUMP AND PLACE");
+						isPerformingAction = act.jumpAndPlaceBlock();
+						break;
+						
+					case 12: //look north
+						System.out.println("\nAction: "+action+" -> LOOK NORTH");
+						isPerformingAction = act.lookNorth();
+						break;
+					
+					default: 
+						System.out.println("Invalid action - do nothing");
+						isPerformingAction = false;
+				}
+			}
+			
+//			if(action != -1) {
+//				action = -1;
+////				Reference.isSending = true;
+//			}
+			
+			if (!isPerformingAction) {
+				Reference.isSending = true;
 			}
 		}
 	}
@@ -150,7 +241,7 @@ public class TestEventHandler {
 	 * @param event
 	 */
 	
-	@SubscribeEvent
+//	@SubscribeEvent
 	public void test(LivingUpdateEvent event)
 	{
 		// Do something to player every update tick:

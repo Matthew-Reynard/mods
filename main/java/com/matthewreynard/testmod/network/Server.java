@@ -30,6 +30,9 @@ public class Server extends Thread {
 	
 	public static Object mc;
 	
+	public static Object lock;
+	public static Object actionLock;
+	
 	public static Minecraft minecraft;
 	
 	public static ServerSocket server;
@@ -39,6 +42,8 @@ public class Server extends Thread {
 	public void run() {
 		
 		String fromClient;
+		lock = new Object();
+		actionLock = new Object();
 		
 		try {
 			server = new ServerSocket(port);
@@ -89,7 +94,7 @@ public class Server extends Thread {
 				
 //				fromClient = inFromClient.readLine();
 				
-				System.out.println("I'm here");
+//				System.out.println("I'm here");
 				
 //				try {
 //					this.sleep(2000);
@@ -106,50 +111,56 @@ public class Server extends Thread {
 //				}
 				
 //				if(fromClient.equals("p")) {
-				if(sendState) {
-					
-					//Pause
-//					try {
-//						Robot robot = new Robot();
-//						robot.keyPress(KeyEvent.VK_ESCAPE);
-//						robot.keyRelease(KeyEvent.VK_ESCAPE);
-//					} catch (AWTException e) {
-//						e.printStackTrace();
-//					}
-					
-					System.out.println("Sending state: " + Arrays.toString(state));
-					
-					outFromServer.writeUTF(Arrays.toString(state));
-					
-					//Python decides action
-					System.out.println("Python deciding action");
-					
-					fromClient = inFromClient.readLine();
-					
-//					if (!fromClient.startsWith("p")) {
-//						setAction(fromClient);							
-//					}
-					
-					setAction(fromClient);	
-					
-					sendState = false;
-					
-					System.out.println("Done");
-					
-					if(minecraft.isGamePaused() || true) {
-						//Unpause
-						try {
-							System.out.println("UNPAUSE");
-							Robot robot = new Robot();
-							robot.keyPress(KeyEvent.VK_ESCAPE);
-							robot.keyRelease(KeyEvent.VK_ESCAPE);
-						} catch (AWTException e) {
-							e.printStackTrace();
+				synchronized (lock) {
+					if(sendState) {
+						
+						//Pause
+	//					try {
+	//						Robot robot = new Robot();
+	//						robot.keyPress(KeyEvent.VK_ESCAPE);
+	//						robot.keyRelease(KeyEvent.VK_ESCAPE);
+	//					} catch (AWTException e) {
+	//						e.printStackTrace();
+	//					}
+						
+						if(minecraft.isGamePaused()) {
+							
+							System.out.println("Sending state: " + Arrays.toString(state));
+							
+							outFromServer.writeUTF(Arrays.toString(state));
+							
+							//Python decides action
+							System.out.println("Python deciding action");
+							
+							fromClient = inFromClient.readLine();
+							
+		//					if (!fromClient.startsWith("p")) {
+		//						setAction(fromClient);							
+		//					}
+							
+//							synchronized (actionLock) {
+								setAction(fromClient);	
+//							}
+							
+							sendState = false;
+							
+							System.out.println("Done");
+							
+							//Unpause
+							try {
+								System.out.println("UNPAUSE");
+								Robot robot = new Robot();
+								robot.keyPress(KeyEvent.VK_ESCAPE);
+								robot.keyRelease(KeyEvent.VK_ESCAPE);
+							} catch (AWTException e) {
+								e.printStackTrace();
+							}
+							
+	//						Reference.isSending = true;
+						
 						}
 						
-						Reference.isSending = true;
 					}
-					
 				}
 				
 			}
