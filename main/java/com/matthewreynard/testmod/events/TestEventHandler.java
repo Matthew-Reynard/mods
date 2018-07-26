@@ -1,5 +1,7 @@
 package com.matthewreynard.testmod.events;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -90,7 +92,46 @@ public class TestEventHandler {
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
-			if (Reference.isSending) {
+//			BlockPos blockpos = mc.player.getPosition().down();
+			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX),Math.floor(mc.player.posY-1),Math.floor(mc.player.posZ));
+			
+			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
+				Log.info("RESET");
+				mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
+			
+				food_x = rnd.nextInt(10);
+	        	food_z = rnd.nextInt(10);
+	        	
+	        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+	        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+	        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+	        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+	        	
+	        	prev_food_x = food_x;
+	        	prev_food_z = food_z;
+			
+	        	// Update state
+				state[0]= (float)Math.floor(mc.player.posZ);
+				state[1]= (float)Math.floor(mc.player.posX);
+				state[2]= (float)food_z;
+				state[3]= (float)food_x;
+				
+				// Doesn't require the server to be running
+				Server.setState(state);
+				Server.setMinecraft(mc);
+				
+				synchronized(Server.lock) {
+					Server.sendState();
+					System.out.println("send it");
+				}
+				
+				action = -1;
+				
+//				isPerformingAction = false;
+			
+			}
+			
+			else if (Reference.isSending) {
 				
 	//			Log.info("Pressed R");
 	//			System.out.println("something");
@@ -132,11 +173,12 @@ public class TestEventHandler {
 				} catch (AWTException e) {
 					e.printStackTrace();
 				}
-//				isPerformingAction = true;
+				
 				Log.info("After pause");
 				
 //				synchronized (Server.actionLock) {
-					action = Server.getAction();
+				action = Server.getAction();
+//				action = -1;
 //				}
 	
 				Log.info("Action: " + Integer.toString(action) + "\n");
@@ -494,7 +536,18 @@ public class TestEventHandler {
         {
 //        	Server.sendState();
         	
-        	Reference.isTraining = !Reference.isTraining;
+//        	Reference.isTraining = !Reference.isTraining;
+        	
+        	try {
+				Log.info("PAUSE");
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ESCAPE);
+				robot.keyRelease(KeyEvent.VK_ESCAPE);
+			} catch (AWTException e) {
+				e.printStackTrace();
+			}
+        	
+        	Minecraft.getMinecraft().inGameHasFocus = true;
         	
 //        	waiting = !waiting;
         	
