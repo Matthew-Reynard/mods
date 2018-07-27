@@ -52,12 +52,10 @@ public class TestEventHandler {
 	
 	public static boolean toggled = false;
 	public static boolean tickchange = false;
-	public static boolean waiting = false;
-	public static boolean isPerformingAction = false;
+//	public static boolean isPerformingAction = false; // Found in Reference now...
 	
 	public static int r = 0;
-	public static int action = -1; // initialised to do nothing
-	public static int action1 = -1; // test variable
+	public static int action = -1; // initialized to do nothing
 	
 	public static boolean isActionComplete = false;
 	
@@ -79,7 +77,9 @@ public class TestEventHandler {
 	public static long numOfTicks = 0;
 	
 	/**
-	 * Called every tick
+	 * Called every world tick
+	 * Can only be called when game is not paused,
+	 * BUG: Might be called while the game is pausing... not sure yet
 	 * 
 	 * @param event
 	 */
@@ -92,11 +92,15 @@ public class TestEventHandler {
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
+			mc.skipRenderWorld = true;
+			
 //			BlockPos blockpos = mc.player.getPosition().down();
 			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX),Math.floor(mc.player.posY-1),Math.floor(mc.player.posZ));
 			
 			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
+				
 				Log.info("RESET");
+				
 				mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
 			
 				food_x = rnd.nextInt(10);
@@ -118,23 +122,19 @@ public class TestEventHandler {
 				
 				// Doesn't require the server to be running
 				Server.setState(state);
-				Server.setMinecraft(mc);
+//				Server.setMinecraft(mc);
 				
 				synchronized(Server.lock) {
-					Server.sendState();
-					System.out.println("send it");
+//					Server.sendState();
+//					System.out.println("send it");
+					Reference.isAwaitingAction = true;
 				}
 				
 				action = -1;
-				
-//				isPerformingAction = false;
 			
 			}
 			
-			else if (Reference.isSending) {
-				
-	//			Log.info("Pressed R");
-	//			System.out.println("something");
+			else if (!Reference.isPerformingAction) {
 				
 				// If the agent is on the food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
@@ -158,11 +158,12 @@ public class TestEventHandler {
 				
 				// Doesn't require the server to be running
 				Server.setState(state);
-				Server.setMinecraft(mc);
+//				Server.setMinecraft(mc);
 				
 				synchronized(Server.lock) {
-					Server.sendState();
-					System.out.println("send it");
+//					Server.sendState();
+					Reference.isAwaitingAction = true;
+//					System.out.println("send it");
 				}
 				
 				try {
@@ -174,8 +175,6 @@ public class TestEventHandler {
 					e.printStackTrace();
 				}
 				
-				Log.info("After pause");
-				
 //				synchronized (Server.actionLock) {
 				action = Server.getAction();
 //				action = -1;
@@ -183,8 +182,8 @@ public class TestEventHandler {
 	
 				Log.info("Action: " + Integer.toString(action) + "\n");
 				
-				Reference.isSending = false;
-				isPerformingAction = true;
+//				Reference.isSending = false;
+				Reference.isPerformingAction = true;
 				act.setPlayerPos(mc.player.posX, mc.player.posY, mc.player.posZ);
 	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
 			}
@@ -192,94 +191,91 @@ public class TestEventHandler {
 			if(!mc.isGamePaused()) {
 				switch(action) {
 					case 1: //up
-						System.out.println("\nAction: "+action+" -> UP");
+//						System.out.println("\nAction: "+action+" -> UP");
 	//					player.setVelocity(-0.05f, 0.0f, 0.0f);
-						isPerformingAction = act.moveForward();
+						Reference.isPerformingAction = act.moveForward();
 						break;
 					
 					case 0: //down
-						System.out.println("\nAction: "+action+" -> DOWN"); 
+//						System.out.println("\nAction: "+action+" -> DOWN"); 
 	//					player.setVelocity(0.05f, 0.0f, 0.0f);
-						isPerformingAction = act.moveBackward();
+						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
 					case 2: //left
-						System.out.println("\nAction: "+action+" -> LEFT");
+//						System.out.println("\nAction: "+action+" -> LEFT");
 	//					player.setVelocity(0.0f, 0.0f, -0.05f);
-						isPerformingAction = act.moveLeft();
+						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
 					case 3: //right
-						System.out.println("\nAction: "+action+" -> RIGHT");							
+//						System.out.println("\nAction: "+action+" -> RIGHT");							
 	//					player.setVelocity(0.0f, 0.0f, 0.05f);
-						isPerformingAction = act.moveRight();
+						Reference.isPerformingAction = act.moveRight();
 						break;
 						
 					case 4: //jump forward
-						System.out.println("\nAction: "+action+" -> JUMP FORWARD");
-						isPerformingAction = act.jumpForward();
+//						System.out.println("\nAction: "+action+" -> JUMP FORWARD");
+						Reference.isPerformingAction = act.jumpForward();
 						break;
 						
 					case 5: //break block forward
-						System.out.println("\nAction: "+action+" -> BREAK BLOCK FORWARD");
-						isPerformingAction = act.breakBlock();
+//						System.out.println("\nAction: "+action+" -> BREAK BLOCK FORWARD");
+						Reference.isPerformingAction = act.breakBlock();
 						break;
 						
 					case 6: //place block forward
-						System.out.println("\nAction: "+action+" -> PLACE BLOCK FORWARD");
-						isPerformingAction = act.placeBlock();
+//						System.out.println("\nAction: "+action+" -> PLACE BLOCK FORWARD");
+						Reference.isPerformingAction = act.placeBlock();
 						break;
 					
 					case 7: //look up
-						System.out.println("\nAction: "+action+" -> LOOK UP");
-						isPerformingAction = act.lookUp();
+//						System.out.println("\nAction: "+action+" -> LOOK UP");
+						Reference.isPerformingAction = act.lookUp();
 						break;
 						
 					case 8: //look down
-						System.out.println("\nAction: "+action+" -> LOOK DOWN");
-						isPerformingAction = act.lookDown();
+//						System.out.println("\nAction: "+action+" -> LOOK DOWN");
+						Reference.isPerformingAction = act.lookDown();
 						break;
 					
 					case 9: //look left
-						System.out.println("\nAction: "+action+" -> LOOK LEFT");
-						isPerformingAction = act.lookLeft();
+//						System.out.println("\nAction: "+action+" -> LOOK LEFT");
+						Reference.isPerformingAction = act.lookLeft();
 						break;
 						
 					case 10: //look right
-						System.out.println("\nAction: "+action+" -> LOOK RIGHT");
-						isPerformingAction = act.lookRight();
+//						System.out.println("\nAction: "+action+" -> LOOK RIGHT");
+						Reference.isPerformingAction = act.lookRight();
 						break;
 						
 					case 11: //jump and place block below
-						System.out.println("\nAction: "+action+" -> JUMP AND PLACE");
-						isPerformingAction = act.jumpAndPlaceBlock();
+//						System.out.println("\nAction: "+action+" -> JUMP AND PLACE");
+						Reference.isPerformingAction = act.jumpAndPlaceBlock();
 						break;
 						
 					case 12: //look north
-						System.out.println("\nAction: "+action+" -> LOOK NORTH");
-						isPerformingAction = act.lookNorth();
+//						System.out.println("\nAction: "+action+" -> LOOK NORTH");
+						Reference.isPerformingAction = act.lookNorth();
 						break;
 					
 					default: 
-						System.out.println("Invalid action - do nothing");
-						isPerformingAction = false;
+//						System.out.println("Invalid action - do nothing");
+						Reference.isPerformingAction = false;
 				}
 			}
 			
-//			if(action != -1) {
-//				action = -1;
+//			if (!Reference.isPerformingAction) {
 ////				Reference.isSending = true;
+////				Reference.isAwaitingAction = true;
+//				System.out.println("");
 //			}
-			
-			if (!isPerformingAction) {
-				Reference.isSending = true;
-			}
 		}
 	}
 	
-	/**
+	/**DEACTIVATED EVENT - In order to re-enable it, uncomment the @SubscribeEvent line above function
 	 * Main function to receive actions from python socket and execute an action every tick
-	 * In order to re-enable it, uncomment the @SubscribeEvent line above function
+	 * 
 	 * @param event
 	 */
 	
@@ -299,10 +295,6 @@ public class TestEventHandler {
 			
 			// Player is invincible
 			player.capabilities.disableDamage = true;
-			
-//			if(!mc.world.isRemote && !waiting) {
-//				System.out.println("It is not waiting...");
-//			}
 			
 			if (toggled) {
 				
@@ -338,8 +330,6 @@ public class TestEventHandler {
 //						}
 //					}
 					
-//					System.out.println("Exited the loop");
-					
 					// If the agent is on the food block
 					if (Math.floor(player.posX) == food_x && Math.floor(player.posZ) == food_z) {
 						food_x = rnd.nextInt(10);
@@ -370,7 +360,7 @@ public class TestEventHandler {
 					Server.setState(x);
 					Server.setMinecraft(mc);
 					
-					if (!isPerformingAction && player.world.isRemote) {
+					if (!Reference.isPerformingAction && player.world.isRemote) {
 						System.out.println("Not performing action");
 						Server.sendState();
 						
@@ -382,7 +372,7 @@ public class TestEventHandler {
 						} catch (AWTException e) {
 							e.printStackTrace();
 						}
-						isPerformingAction = true;
+						Reference.isPerformingAction = true;
 						System.out.println("After pause");
 					}
 					
@@ -395,75 +385,75 @@ public class TestEventHandler {
 							case 0: //up
 								System.out.println("\nAction: "+action+" -> UP");
 //								player.setVelocity(-0.05f, 0.0f, 0.0f);
-								isPerformingAction = act.moveForward();
+								Reference.isPerformingAction = act.moveForward();
 								break;
 							
 							case 1: //down
 								System.out.println("\nAction: "+action+" -> DOWN"); 
 //								player.setVelocity(0.05f, 0.0f, 0.0f);
-								isPerformingAction = act.moveBackward();
+								Reference.isPerformingAction = act.moveBackward();
 								break;
 							
 							case 2: //left
 								System.out.println("\nAction: "+action+" -> LEFT");
 //								player.setVelocity(0.0f, 0.0f, -0.05f);
-								isPerformingAction = act.moveLeft();
+								Reference.isPerformingAction = act.moveLeft();
 								break;
 							
 							case 3: //right
 								System.out.println("\nAction: "+action+" -> RIGHT");							
 //								player.setVelocity(0.0f, 0.0f, 0.05f);
-								isPerformingAction = act.moveRight();
+								Reference.isPerformingAction = act.moveRight();
 								break;
 								
 							case 4: //jump forward
 								System.out.println("\nAction: "+action+" -> JUMP FORWARD");
-								isPerformingAction = act.jumpForward();
+								Reference.isPerformingAction = act.jumpForward();
 								break;
 								
 							case 5: //break block forward
 								System.out.println("\nAction: "+action+" -> BREAK BLOCK FORWARD");
-								isPerformingAction = act.breakBlock();
+								Reference.isPerformingAction = act.breakBlock();
 								break;
 								
 							case 6: //place block forward
 								System.out.println("\nAction: "+action+" -> PLACE BLOCK FORWARD");
-								isPerformingAction = act.placeBlock();
+								Reference.isPerformingAction = act.placeBlock();
 								break;
 							
 							case 7: //look up
 								System.out.println("\nAction: "+action+" -> LOOK UP");
-								isPerformingAction = act.lookUp();
+								Reference.isPerformingAction = act.lookUp();
 								break;
 								
 							case 8: //look down
 								System.out.println("\nAction: "+action+" -> LOOK DOWN");
-								isPerformingAction = act.lookDown();
+								Reference.isPerformingAction = act.lookDown();
 								break;
 							
 							case 9: //look left
 								System.out.println("\nAction: "+action+" -> LOOK LEFT");
-								isPerformingAction = act.lookLeft();
+								Reference.isPerformingAction = act.lookLeft();
 								break;
 								
 							case 10: //look right
 								System.out.println("\nAction: "+action+" -> LOOK RIGHT");
-								isPerformingAction = act.lookRight();
+								Reference.isPerformingAction = act.lookRight();
 								break;
 								
 							case 11: //jump and place block below
 								System.out.println("\nAction: "+action+" -> JUMP AND PLACE");
-								isPerformingAction = act.jumpAndPlaceBlock();
+								Reference.isPerformingAction = act.jumpAndPlaceBlock();
 								break;
 								
 							case 12: //look north
 								System.out.println("\nAction: "+action+" -> LOOK NORTH");
-								isPerformingAction = act.lookNorth();
+								Reference.isPerformingAction = act.lookNorth();
 								break;
 							
 							default: 
 //								System.out.println("Invalid action - do nothing");
-								isPerformingAction = false;
+								Reference.isPerformingAction = false;
 						}
 					}
 				}
@@ -487,7 +477,7 @@ public class TestEventHandler {
 	/**
 	 * All key inputs function
 	 * 
-	 * Keys used:
+	 * Keys already in use in Minecraft:
 	 * W, A, S, D, Space, Ctrl, Shift, Tab, Q, E, T, F, X, C, L, 1-9, ~, F1-F12 
 	 * 
 	 * 
@@ -506,14 +496,6 @@ public class TestEventHandler {
 		MinecraftServer mcServer = mc.player.getServer();
 		
 		Actions act = new Actions(player);
-		
-		// Setting the state of snake minecraft
-		float[] x = new float[4];
-		
-		x[0]= (float)Math.floor(mc.player.posZ);
-		x[1]= (float)Math.floor(mc.player.posX);
-		x[2]= (float)food_z;
-		x[3]= (float)food_x;
 		
 		// KEY V
         if (Keybinds.toggle.isPressed())
@@ -534,46 +516,39 @@ public class TestEventHandler {
         // KEY R
         if (Keybinds.print.isPressed())
         {
-//        	Server.sendState();
+        	Log.info("RESET");
+			mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
+		
+			food_x = rnd.nextInt(10);
+        	food_z = rnd.nextInt(10);
         	
-//        	Reference.isTraining = !Reference.isTraining;
+        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
         	
-        	try {
-				Log.info("PAUSE");
-				Robot robot = new Robot();
-				robot.keyPress(KeyEvent.VK_ESCAPE);
-				robot.keyRelease(KeyEvent.VK_ESCAPE);
-			} catch (AWTException e) {
-				e.printStackTrace();
-			}
-        	
-        	Minecraft.getMinecraft().inGameHasFocus = true;
-        	
-//        	waiting = !waiting;
-        	
-//        	System.out.println("Waiting " + waiting);
-        	
-//        	if(!world.isRemote) {
-//	        	try {
-//					mc.getIntegratedServer().wait(1000);
-//				} catch (InterruptedException e1) {
-//					e1.printStackTrace();
-//				}
-//        	}
-//        	else {
-//        		System.out.println("Integrated server is null");
-//        	}
-        	
-//        	action = 11;
-//        	isPerformingAction = true;
-//        	act.setPlayerPos(player.posX, player.posY, player.posZ);
-//        	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
-        	
-//        	try {
-//				Thread.sleep(1,10);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
+        	prev_food_x = food_x;
+        	prev_food_z = food_z;
+		
+        	// Update state
+			state[0]= (float)Math.floor(mc.player.posZ);
+			state[1]= (float)Math.floor(mc.player.posX);
+			state[2]= (float)food_z;
+			state[3]= (float)food_x;
+			
+			// Doesn't require the server to be running
+			Server.setState(state);
+			Server.setMinecraft(mc);
+			
+//			synchronized(Server.lock) {
+//				Server.sendState();
+//				System.out.println("send it");
 //			}
+			
+			action = -1;
+        	
+        	Reference.isTraining = !Reference.isTraining;
+        	 	
         	
 //			server.setmcServer(mc.getIntegratedServer().getServerThread());
 //			
@@ -595,28 +570,9 @@ public class TestEventHandler {
         // KEY B
         if (Keybinds.state.isPressed())
         {
-        	
-        	food_x = rnd.nextInt(10);
-        	food_z = rnd.nextInt(10);
-
-        	Server.setState(x);
-        	
-        	// Not used yet
-//        	Server.send();
-        	
-        	IBlockState state_red = world.getBlockState(new BlockPos(0,99,0));
-        	IBlockState state_wood = world.getBlockState(new BlockPos(0,98,0));
-        	world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-        	world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
-        	
-//        	IBlockState state_red = mc.world.getBlockState(new BlockPos(-1,5,-1));
-//        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(-1,4,-1));
-//        	world.setBlockState(new BlockPos(prev_food_x,4,prev_food_z), state_wood);
-//        	world.setBlockState(new BlockPos(food_x,4,food_z), state_red);
-        	
-        	prev_food_x = food_x;
-        	prev_food_z = food_z;
-        	
+        	System.out.println("STOP");
+        	Reference.isTraining = !Reference.isTraining;
+        	server.closeConnection();
         }
         
         // Looking
@@ -624,7 +580,7 @@ public class TestEventHandler {
 //			player.setLocationAndAngles(player.posX + 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
         	
         	action = 7;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
@@ -632,7 +588,7 @@ public class TestEventHandler {
 //			player.setLocationAndAngles(player.posX - 1.0, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
 			
         	action = 8;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
@@ -641,7 +597,7 @@ public class TestEventHandler {
 			
 //			
         	action = 9;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
@@ -649,7 +605,7 @@ public class TestEventHandler {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ + 1.0, player.rotationYaw, player.rotationPitch);
 			
         	action = 10;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
 		}
@@ -659,35 +615,35 @@ public class TestEventHandler {
         // Key Y
         if (Keybinds.north.isPressed()) {
         	action = 0;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key H
         else if (Keybinds.south.isPressed()) { // Key H
         	action = 1;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key G
         else if (Keybinds.west.isPressed()) {
         	action = 2;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key J
         else if (Keybinds.east.isPressed()) {
         	action = 3;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key M
         else if (Keybinds.jumpForward.isPressed()) {
         	action = 4;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
@@ -697,45 +653,44 @@ public class TestEventHandler {
         // Key U
         if (Keybinds.breakBlock.isPressed()) {
         	action = 5;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key I
         else if (Keybinds.placeBlock.isPressed()) {
         	action = 6;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
         // Key N
         else if (Keybinds.reset.isPressed()) {
         	action = 12;
-        	isPerformingAction = true;
+        	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
         	act.setPlayerAngles(player.rotationYaw, player.rotationPitch);
         }
     }
 
 	
-	/**
+	/**DEACTIVATED EVENT
 	 * Super Jump if toggled
 	 * Just for fun :)
 	 * @param event
 	 */
 	
 //	@SubscribeEvent
-//	public void superJump(LivingJumpEvent event) {
-////		System.out.println("Some event called; is this the client side? " + event.getEntity().world.isRemote);
-//		
-//		if (event.getEntity() instanceof EntityPlayer && toggled) {
-//			EntityPlayer player = (EntityPlayer) event.getEntity();
-//			player.motionY += 1.2D;
-//		}
-//	}
+	public void superJump(LivingJumpEvent event) {
+		
+		if (event.getEntity() instanceof EntityPlayer && toggled) {
+			EntityPlayer player = (EntityPlayer) event.getEntity();
+			player.motionY += 1.2D;
+		}
+	}
 	
-	/**Network event
-	 * 
+	/**
+	 * Network event
 	 * Not used at the moment
 	 * 
 	 * @param event
@@ -754,9 +709,27 @@ public class TestEventHandler {
 		
     }
 	
-	// Used to set the server for the synchronized block to used same lock (wait and notify) -> NOT WORKING!!!
+	
+	/**
+	 * Used for the other classes to get access to the same instance of the Socket Server used for Java-Python communication
+	 * Set the server for the synchronized block to used same lock (wait() and notify()) -> NOT WORKING!!!
+	 *  
+	 * @param s
+	 * An instance of the Server class 
+	 */
 	public void getServer(Server s) {
 		server = s;
+	}
+	
+	
+	/**
+	 * Resets the player back to the start coordinates of the snake game (could be random)
+	 * Resets the position of the food on the 10x10 grid
+	 * 
+	 * @param null 
+	 */
+	public void resetPlayer() {
+		System.out.println("Does nothing yet");
 	}
 
 }
@@ -800,6 +773,6 @@ public class TestEventHandler {
  * server.isSinglePlayer();
  * 
  * NetworkHandler.sendToServer(new MessageExplode());
- * 
+ * System.out.println("Some event called; is this the client side? " + event.getEntity().world.isRemote);
  * 
  * */

@@ -112,7 +112,7 @@ public class Server extends Thread {
 				
 //				if(fromClient.equals("p")) {
 				synchronized (lock) {
-					if(sendState) {
+					if(Reference.isAwaitingAction) {
 						
 						//Pause
 	//					try {
@@ -125,12 +125,12 @@ public class Server extends Thread {
 						
 						if(minecraft.isGamePaused()) {
 							
-							System.out.println("Sending state: " + Arrays.toString(state));
+//							System.out.println("Sending state: " + Arrays.toString(state));
 							
 							outFromServer.writeUTF(Arrays.toString(state));
 							
 							//Python decides action
-							System.out.println("Python deciding action");
+//							System.out.println("Python deciding action");
 							
 							fromClient = inFromClient.readLine();
 							
@@ -139,22 +139,27 @@ public class Server extends Thread {
 		//					}
 							
 //							synchronized (actionLock) {
-								setAction(fromClient);	
+							setAction(fromClient);	
 //							}
 							
-							sendState = false;
+//							sendState = false;
 							
-							System.out.println("Done");
+//							System.out.println("Done");
 							
 							//Unpause
 							try {
-								System.out.println("UNPAUSE");
+								Log.info("UNPAUSE");
 								Robot robot = new Robot();
 								robot.keyPress(KeyEvent.VK_ESCAPE);
 								robot.keyRelease(KeyEvent.VK_ESCAPE);
 							} catch (AWTException e) {
 								e.printStackTrace();
 							}
+							
+							minecraft.skipRenderWorld = true;
+							
+							Reference.isAwaitingAction = false;
+							
 							
 	//						Reference.isSending = true;
 						
@@ -194,7 +199,6 @@ public class Server extends Thread {
 		return action;
 	}
 	
-	// NOT USED
 	public static void sendState() {
 		
 		System.out.println("Sending state...");

@@ -44,12 +44,13 @@ public class Actions {
 //		System.out.print("X:" + player.posX);
 //		System.out.println("\tStartX"+startXpos);
 		if (player.posX < startXpos + distanceToMove) {
-			player.setVelocity(0.06f, 0.0f, 0.0f);
+			player.setVelocity(0.07f, 0.0f, 0.0f);
 			actionComplete = false;
 			
 		}
 		else {
 			actionComplete = true;
+			player.setVelocity(0.0f, 0.0f, 0.0f);
 		}
 		return !actionComplete;
 	}
@@ -61,12 +62,13 @@ public class Actions {
 //		System.out.print("X:" + player.posX);
 //		System.out.println("\tStartX"+startXpos);
 		if (player.posX > startXpos - distanceToMove) {
-			player.setVelocity(-0.06f, 0.0f, 0.0f);
+			player.setVelocity(-0.07f, 0.0f, 0.0f);
 			actionComplete = false;
 
 		}
 		else {
 			actionComplete = true;
+			player.setVelocity(0.0f, 0.0f, 0.0f);
 		}
 		return !actionComplete;
 	}
@@ -78,12 +80,13 @@ public class Actions {
 //		System.out.print("Z:" + player.posZ);
 //		System.out.println("\tStartZ"+startZpos);
 		if (player.posZ > startZpos - distanceToMove) {
-			player.setVelocity(0.0f, 0.0f, -0.06f);
+			player.setVelocity(0.0f, 0.0f, -0.07f);
 			actionComplete = false;
 			
 		}
 		else {
 			actionComplete = true;
+			player.setVelocity(0.0f, 0.0f, 0.0f);
 		}
 		return !actionComplete;
 	}
@@ -95,12 +98,13 @@ public class Actions {
 //		System.out.print("Z:" + player.posZ);
 //		System.out.println("\tStartZ"+startZpos);
 		if (player.posZ < startZpos + distanceToMove) {
-			player.setVelocity(0.0f, 0.0f, 0.06f);
+			player.setVelocity(0.0f, 0.0f, 0.07f);
 			actionComplete = false;
 			
 		}
 		else {
 			actionComplete = true;
+			player.setVelocity(0.0f, 0.0f, 0.0f);
 		}
 		return !actionComplete;
 	}
