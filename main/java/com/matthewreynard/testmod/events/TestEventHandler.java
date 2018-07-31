@@ -92,7 +92,7 @@ public class TestEventHandler {
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
-			mc.skipRenderWorld = true;
+//			mc.skipRenderWorld = true;
 			
 //			BlockPos blockpos = mc.player.getPosition().down();
 			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX),Math.floor(mc.player.posY-1),Math.floor(mc.player.posZ));
@@ -103,8 +103,8 @@ public class TestEventHandler {
 				
 				mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
 			
-				food_x = rnd.nextInt(10);
-	        	food_z = rnd.nextInt(10);
+				food_x = rnd.nextInt(8);
+	        	food_z = rnd.nextInt(8);
 	        	
 	        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
 	        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
@@ -124,11 +124,13 @@ public class TestEventHandler {
 				Server.setState(state);
 //				Server.setMinecraft(mc);
 				
-				synchronized(Server.lock) {
+//				synchronized(Server.lock) {
 //					Server.sendState();
 //					System.out.println("send it");
-					Reference.isAwaitingAction = true;
-				}
+//					Reference.isAwaitingAction = true;
+					Reference.setAction(true);
+					Reference.isPerformingAction = false;
+//				}
 				
 				action = -1;
 			
@@ -138,8 +140,8 @@ public class TestEventHandler {
 				
 				// If the agent is on the food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
-					food_x = rnd.nextInt(10);
-		        	food_z = rnd.nextInt(10);
+					food_x = rnd.nextInt(8);
+		        	food_z = rnd.nextInt(8);
 		        	
 		        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
 		        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
@@ -160,11 +162,12 @@ public class TestEventHandler {
 				Server.setState(state);
 //				Server.setMinecraft(mc);
 				
-				synchronized(Server.lock) {
+//				synchronized(Server.lock) {
 //					Server.sendState();
-					Reference.isAwaitingAction = true;
+//					Reference.isAwaitingAction = true;
+					Reference.setAction(true);
 //					System.out.println("send it");
-				}
+//				}
 				
 				try {
 					Log.info("PAUSE");
@@ -188,7 +191,7 @@ public class TestEventHandler {
 	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
 			}
 			
-			if(!mc.isGamePaused()) {
+			if(!mc.isGamePaused() && !Reference.isAwaitingAction) {
 				switch(action) {
 					case 1: //up
 //						System.out.println("\nAction: "+action+" -> UP");
@@ -519,8 +522,8 @@ public class TestEventHandler {
         	Log.info("RESET");
 			mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
 		
-			food_x = rnd.nextInt(10);
-        	food_z = rnd.nextInt(10);
+			food_x = rnd.nextInt(8);
+        	food_z = rnd.nextInt(8);
         	
         	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
         	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));

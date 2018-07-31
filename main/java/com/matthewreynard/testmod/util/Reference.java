@@ -12,6 +12,11 @@ public class Reference {
 	//Useful global variables
 	public static boolean isTraining = false;
 //	public static boolean isSending = true;
-	public static boolean isAwaitingAction = false;
+	public static volatile boolean isAwaitingAction = false;
 	public static boolean isPerformingAction = false; 
+	
+	public static synchronized void setAction(boolean x) {
+		isAwaitingAction = x;
+	}
+	
 }

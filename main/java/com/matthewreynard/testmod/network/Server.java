@@ -28,10 +28,10 @@ public class Server extends Thread {
 	
 	public static int port = 5555;
 	
-	public static Object mc;
+//	public static Object mc;
 	
-	public static Object lock;
-	public static Object actionLock;
+//	public static Object lock;
+//	public static Object actionLock;
 	
 	public static Minecraft minecraft;
 	
@@ -42,8 +42,8 @@ public class Server extends Thread {
 	public void run() {
 		
 		String fromClient;
-		lock = new Object();
-		actionLock = new Object();
+//		lock = new Object();
+//		actionLock = new Object();
 		
 		try {
 			server = new ServerSocket(port);
@@ -111,7 +111,7 @@ public class Server extends Thread {
 //				}
 				
 //				if(fromClient.equals("p")) {
-				synchronized (lock) {
+//				synchronized (lock) {
 					if(Reference.isAwaitingAction) {
 						
 						//Pause
@@ -156,9 +156,10 @@ public class Server extends Thread {
 								e.printStackTrace();
 							}
 							
-							minecraft.skipRenderWorld = true;
+//							minecraft.skipRenderWorld = true;
 							
-							Reference.isAwaitingAction = false;
+//							Reference.isAwaitingAction = false;
+							Reference.setAction(false);
 							
 							
 	//						Reference.isSending = true;
@@ -166,7 +167,7 @@ public class Server extends Thread {
 						}
 						
 					}
-				}
+//				}
 				
 			}
 			
@@ -227,9 +228,9 @@ public class Server extends Thread {
 		return close;
 	}
 	
-	public void setmcServer(Object s) {
-		mc = s;
-	}
+//	public void setmcServer(Object s) {
+//		mc = s;
+//	}
 	
 	public static void setMinecraft(Minecraft m) {
 		minecraft = m;
