@@ -123,28 +123,35 @@ public class Server extends Thread {
 	//						e.printStackTrace();
 	//					}
 						
-						if(minecraft.isGamePaused()) {
+//						if(!minecraft.isGamePaused()) { // THIS IS FOR RUNNING THE CNN IN MINECRAFT WITHOUT PAUSING... SMOOTH GAMEPLAY
+						if(minecraft.isGamePaused()) { // THIS IS FOR TRAINING
 							
 //							System.out.println("Sending state: " + Arrays.toString(state));
 							
-							outFromServer.writeUTF(Arrays.toString(state));
+							if (Reference.isEpisodeDone) {
+								outFromServer.writeUTF("[done]");
+								
+								Reference.setDone(false);
+							}
+							else {
+								outFromServer.writeUTF(Arrays.toString(state));
 							
-							//Python decides action
-//							System.out.println("Python deciding action");
+								//Python decides action
+	//							System.out.println("Python deciding action");
+								
+								fromClient = inFromClient.readLine();
+								
+			//					if (!fromClient.startsWith("p")) {
+			//						setAction(fromClient);							
+			//					}
+								
+	//							synchronized (actionLock) {
+								setAction(fromClient);	
+	//							}
+								
+	//							sendState = false;
+							}
 							
-							fromClient = inFromClient.readLine();
-							
-		//					if (!fromClient.startsWith("p")) {
-		//						setAction(fromClient);							
-		//					}
-							
-//							synchronized (actionLock) {
-							setAction(fromClient);	
-//							}
-							
-//							sendState = false;
-							
-//							System.out.println("Done");
 							
 							//Unpause
 							try {

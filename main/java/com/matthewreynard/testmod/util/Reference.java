@@ -14,9 +14,14 @@ public class Reference {
 //	public static boolean isSending = true;
 	public static volatile boolean isAwaitingAction = false;
 	public static boolean isPerformingAction = false; 
+	public static boolean isEpisodeDone = false;
 	
 	public static synchronized void setAction(boolean x) {
 		isAwaitingAction = x;
+	}
+	
+	public static synchronized void setDone(boolean x) {
+		isEpisodeDone = x;
 	}
 	
 }

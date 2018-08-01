@@ -133,6 +133,17 @@ public class TestEventHandler {
 //				}
 				
 				action = -1;
+				
+				Reference.setDone(true);
+				
+				try {
+					Log.info("PAUSE");
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
 			
 			}
 			
