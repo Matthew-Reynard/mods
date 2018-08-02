@@ -67,7 +67,7 @@ public class TestEventHandler {
 	
 	public static Random rnd = new Random();
 	
-	public static Server server;
+//	public static Server server;
 	
 	public static float[] state = new float[4];
 	
@@ -94,48 +94,18 @@ public class TestEventHandler {
 			
 //			mc.skipRenderWorld = true;
 			
-//			BlockPos blockpos = mc.player.getPosition().down();
-			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX),Math.floor(mc.player.posY-1),Math.floor(mc.player.posZ));
+			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY-1), Math.floor(mc.player.posZ));
 			
+			// if the agent is on a glass block -> RESET game (game over), next episode
 			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
 				
-				Log.info("RESET");
+				// Resets player for new episode
+				resetPlayer(mc);
 				
-				mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
-			
-				food_x = rnd.nextInt(8);
-	        	food_z = rnd.nextInt(8);
-	        	
-	        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
-	        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
-	        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-	        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
-	        	
-	        	prev_food_x = food_x;
-	        	prev_food_z = food_z;
-			
-	        	// Update state
-				state[0]= (float)Math.floor(mc.player.posZ);
-				state[1]= (float)Math.floor(mc.player.posX);
-				state[2]= (float)food_z;
-				state[3]= (float)food_x;
-				
-				// Doesn't require the server to be running
-				Server.setState(state);
-//				Server.setMinecraft(mc);
-				
-//				synchronized(Server.lock) {
-//					Server.sendState();
-//					System.out.println("send it");
-//					Reference.isAwaitingAction = true;
-					Reference.setAction(true);
-					Reference.isPerformingAction = false;
-//				}
-				
-				action = -1;
-				
+				// the episode is done
 				Reference.setDone(true);
 				
+				// Pauses so that the NN can update
 				try {
 					Log.info("PAUSE");
 					Robot robot = new Robot();
@@ -149,7 +119,7 @@ public class TestEventHandler {
 			
 			else if (!Reference.isPerformingAction) {
 				
-				// If the agent is on the food block
+				// If the agent is on the food block -> Update to new food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
 					food_x = rnd.nextInt(8);
 		        	food_z = rnd.nextInt(8);
@@ -171,15 +141,11 @@ public class TestEventHandler {
 				
 				// Doesn't require the server to be running
 				Server.setState(state);
-//				Server.setMinecraft(mc);
 				
-//				synchronized(Server.lock) {
-//					Server.sendState();
-//					Reference.isAwaitingAction = true;
-					Reference.setAction(true);
-//					System.out.println("send it");
-//				}
-				
+				// Agent is waiting for an action command from NN
+				Reference.setAction(true);
+
+				// Pause
 				try {
 					Log.info("PAUSE");
 					Robot robot = new Robot();
@@ -189,42 +155,54 @@ public class TestEventHandler {
 					e.printStackTrace();
 				}
 				
-//				synchronized (Server.actionLock) {
-				action = Server.getAction();
-//				action = -1;
-//				}
+				// Get the action number from the NN
+//				action = Server.getAction();
 	
-				Log.info("Action: " + Integer.toString(action) + "\n");
+//				Log.info("Action: " + Integer.toString(action) + "\n");
 				
-//				Reference.isSending = false;
+				// Agent is now set to be performing an action
 				Reference.isPerformingAction = true;
 				act.setPlayerPos(mc.player.posX, mc.player.posY, mc.player.posZ);
 	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
 			}
 			
+			// If the game is unpaused and the agent has an action number from NN
 			if(!mc.isGamePaused() && !Reference.isAwaitingAction) {
+				
+				action = Server.getAction();
+				
+//				Log.info("Action: " + Integer.toString(action) + "\n");
+				
 				switch(action) {
-					case 1: //up
+					case 1: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
-	//					player.setVelocity(-0.05f, 0.0f, 0.0f);
+//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+						
 						Reference.isPerformingAction = act.moveForward();
 						break;
 					
-					case 0: //down
+					case 0: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
-	//					player.setVelocity(0.05f, 0.0f, 0.0f);
+//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+						
 						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
 					case 2: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
-	//					player.setVelocity(0.0f, 0.0f, -0.05f);
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+						
 						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
 					case 3: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
-	//					player.setVelocity(0.0f, 0.0f, 0.05f);
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+						
 						Reference.isPerformingAction = act.moveRight();
 						break;
 						
@@ -278,16 +256,11 @@ public class TestEventHandler {
 						Reference.isPerformingAction = false;
 				}
 			}
-			
-//			if (!Reference.isPerformingAction) {
-////				Reference.isSending = true;
-////				Reference.isAwaitingAction = true;
-//				System.out.println("");
-//			}
 		}
 	}
 	
-	/**DEACTIVATED EVENT - In order to re-enable it, uncomment the @SubscribeEvent line above function
+	/**
+	 * DEACTIVATED EVENT - In order to re-enable it, uncomment the @SubscribeEvent line above function
 	 * Main function to receive actions from python socket and execute an action every tick
 	 * 
 	 * @param event
@@ -530,54 +503,15 @@ public class TestEventHandler {
         // KEY R
         if (Keybinds.print.isPressed())
         {
-        	Log.info("RESET");
-			mc.player.setLocationAndAngles(3, 101, 3, mc.player.rotationYaw, mc.player.rotationPitch);
-		
-			food_x = rnd.nextInt(8);
-        	food_z = rnd.nextInt(8);
         	
-        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
-        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
-        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
-        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
-        	
-        	prev_food_x = food_x;
-        	prev_food_z = food_z;
-		
-        	// Update state
-			state[0]= (float)Math.floor(mc.player.posZ);
-			state[1]= (float)Math.floor(mc.player.posX);
-			state[2]= (float)food_z;
-			state[3]= (float)food_x;
-			
-			// Doesn't require the server to be running
-			Server.setState(state);
+        	// Sends the Minecraft instance to the Server
 			Server.setMinecraft(mc);
 			
-//			synchronized(Server.lock) {
-//				Server.sendState();
-//				System.out.println("send it");
-//			}
-			
-			action = -1;
+        	// reset agent in random location, food random, action -1
+        	resetPlayer(mc);      	
         	
-        	Reference.isTraining = !Reference.isTraining;
-        	 	
-        	
-//			server.setmcServer(mc.getIntegratedServer().getServerThread());
-//			
-//			synchronized (mc.getIntegratedServer().getServerThread()) {
-//				try {
-//					System.out.println("Waiting...");
-//					
-//					mc.getIntegratedServer().getServerThread().wait();
-//					
-//					System.out.println("Resumed...");
-//					
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
+			//Begins training
+        	Reference.isTraining = true;
         	
         }
         
@@ -585,8 +519,8 @@ public class TestEventHandler {
         if (Keybinds.state.isPressed())
         {
         	System.out.println("STOP");
-        	Reference.isTraining = !Reference.isTraining;
-        	server.closeConnection();
+        	Reference.isTraining = false;
+        	Server.closeConnection();
         }
         
         // Looking
@@ -688,7 +622,8 @@ public class TestEventHandler {
     }
 
 	
-	/**DEACTIVATED EVENT
+	/**
+	 * DEACTIVATED EVENT
 	 * Super Jump if toggled
 	 * Just for fun :)
 	 * @param event
@@ -732,18 +667,53 @@ public class TestEventHandler {
 	 * An instance of the Server class 
 	 */
 	public void getServer(Server s) {
-		server = s;
+//		server = s;
 	}
 	
 	
 	/**
 	 * Resets the player back to the start coordinates of the snake game (could be random)
-	 * Resets the position of the food on the 10x10 grid
+	 * Resets the position of the food on the 10x10 (or 8x8) grid
 	 * 
 	 * @param null 
 	 */
-	public void resetPlayer() {
-		System.out.println("Does nothing yet");
+	public void resetPlayer(Minecraft mc) {
+		Log.info("RESET");
+		
+		// reset the players position to these random locations
+		mc.player.setLocationAndAngles(rnd.nextInt(8) + 0.5D, 101, rnd.nextInt(8) + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
+	
+		// randomizes the new foods location
+		food_x = rnd.nextInt(8);
+    	food_z = rnd.nextInt(8);
+    	
+    	// Changes the new food to red wool and the old food back to wood
+    	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+    	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+    	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+    	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+    	
+    	// Allows the previous food to turn into wood again
+    	prev_food_x = food_x;
+    	prev_food_z = food_z;
+	
+    	// Update the agents state
+		state[0]= (float)Math.floor(mc.player.posZ);
+		state[1]= (float)Math.floor(mc.player.posX);
+		state[2]= (float)food_z;
+		state[3]= (float)food_x;
+		
+		// Doesn't require the server to be running
+		Server.setState(state);
+
+		// the agent is waiting for an action to come from the NN
+		Reference.setAction(true);
+		Reference.isPerformingAction = false;
+
+		// sets the action to do nothing
+		action = -1;
+		Server.setAction("-1");
+		
 	}
 
 }

@@ -15,6 +15,7 @@ public class Reference {
 	public static volatile boolean isAwaitingAction = false;
 	public static boolean isPerformingAction = false; 
 	public static boolean isEpisodeDone = false;
+	public static int actionCount = 0;
 	
 	public static synchronized void setAction(boolean x) {
 		isAwaitingAction = x;
@@ -22,6 +23,14 @@ public class Reference {
 	
 	public static synchronized void setDone(boolean x) {
 		isEpisodeDone = x;
+	}
+	
+	public static void actionCountIncrement() {
+		actionCount++;
+	}
+	
+	public static void actionCountReset() {
+		actionCount = 0;
 	}
 	
 }

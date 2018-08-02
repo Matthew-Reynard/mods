@@ -23,15 +23,10 @@ import net.minecraft.world.World;
 public class Server extends Thread {
 	
 	public static boolean open = false;
-	public static float[] state = {0,0,0,0};
+	public static float[] state = {0,0,0,0}; 
 	public static int action = -1;
 	
 	public static int port = 5555;
-	
-//	public static Object mc;
-	
-//	public static Object lock;
-//	public static Object actionLock;
 	
 	public static Minecraft minecraft;
 	
@@ -39,11 +34,10 @@ public class Server extends Thread {
 	
 	public static boolean sendState = false;
 	
+	// Thread function
 	public void run() {
 		
 		String fromClient;
-//		lock = new Object();
-//		actionLock = new Object();
 		
 		try {
 			server = new ServerSocket(port);
@@ -57,6 +51,7 @@ public class Server extends Thread {
 			
 			DataOutputStream outFromServer = new DataOutputStream(connected.getOutputStream());
 			
+			// Open the server
 			open = true;
 			
 //			while(open) {
@@ -92,107 +87,74 @@ public class Server extends Thread {
 			
 			while(open) {
 				
-//				fromClient = inFromClient.readLine();
-				
-//				System.out.println("I'm here");
-				
-//				try {
-//					this.sleep(2000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-				
-//				try {
-//					Robot r = new Robot();
-//					r.keyPress(KeyEvent.VK_ESCAPE);
-//					r.keyRelease(KeyEvent.VK_ESCAPE);
-//				} catch (AWTException e) {
-//					e.printStackTrace();
-//				}
-				
-//				if(fromClient.equals("p")) {
-//				synchronized (lock) {
-					if(Reference.isAwaitingAction) {
+				if(Reference.isAwaitingAction) {
+					
+					//Pause
+//					try {
+//						Robot robot = new Robot();
+//						robot.keyPress(KeyEvent.VK_ESCAPE);
+//						robot.keyRelease(KeyEvent.VK_ESCAPE);
+//					} catch (AWTException e) {
+//						e.printStackTrace();
+//					}
+					
+//					if(!minecraft.isGamePaused()) { // THIS IS FOR RUNNING THE CNN IN MINECRAFT WITHOUT PAUSING... SMOOTH GAMEPLAY
+					if(minecraft.isGamePaused()) { // THIS IS FOR TRAINING
 						
-						//Pause
-	//					try {
-	//						Robot robot = new Robot();
-	//						robot.keyPress(KeyEvent.VK_ESCAPE);
-	//						robot.keyRelease(KeyEvent.VK_ESCAPE);
-	//					} catch (AWTException e) {
-	//						e.printStackTrace();
-	//					}
-						
-//						if(!minecraft.isGamePaused()) { // THIS IS FOR RUNNING THE CNN IN MINECRAFT WITHOUT PAUSING... SMOOTH GAMEPLAY
-						if(minecraft.isGamePaused()) { // THIS IS FOR TRAINING
-							
 //							System.out.println("Sending state: " + Arrays.toString(state));
-							
-							if (Reference.isEpisodeDone) {
-								outFromServer.writeUTF("[done]");
-								
-								Reference.setDone(false);
-							}
-							else {
-								outFromServer.writeUTF(Arrays.toString(state));
-							
-								//Python decides action
-	//							System.out.println("Python deciding action");
-								
-								fromClient = inFromClient.readLine();
-								
-			//					if (!fromClient.startsWith("p")) {
-			//						setAction(fromClient);							
-			//					}
-								
-	//							synchronized (actionLock) {
-								setAction(fromClient);	
-	//							}
-								
-	//							sendState = false;
-							}
-							
-							
-							//Unpause
-							try {
-								Log.info("UNPAUSE");
-								Robot robot = new Robot();
-								robot.keyPress(KeyEvent.VK_ESCAPE);
-								robot.keyRelease(KeyEvent.VK_ESCAPE);
-							} catch (AWTException e) {
-								e.printStackTrace();
-							}
-							
-//							minecraft.skipRenderWorld = true;
-							
-//							Reference.isAwaitingAction = false;
-							Reference.setAction(false);
-							
-							
-	//						Reference.isSending = true;
 						
+						if (Reference.isEpisodeDone) {
+							// sends done to python
+							outFromServer.writeUTF("[done]");
+							
+							// Start of a new episode (isEpisodeDone = false)
+							Reference.setDone(false);
+						}
+						else {
+							
+							// sends the state of Minecraft agent to python
+							outFromServer.writeUTF(Arrays.toString(state));
+						
+							//Python decides action...
+							
+							fromClient = inFromClient.readLine();
+							
+							// sets this class variable action to the correct action number from python
+							setAction(fromClient);	
 						}
 						
+						//Unpause
+						try {
+							Log.info("UNPAUSE");
+							Robot robot = new Robot();
+							robot.keyPress(KeyEvent.VK_ESCAPE);
+							robot.keyRelease(KeyEvent.VK_ESCAPE);
+						} catch (AWTException e) {
+							e.printStackTrace();
+						}
+						
+//						minecraft.skipRenderWorld = true;
+						
+						// Agent is no longer waiting for an action number, the action number was set
+						Reference.setAction(false);
+						
 					}
-//				}
-				
+				}
 			}
 			
-			// Close the client
-			outFromServer.writeUTF(closeClient());
+			//Close the python client safely
+			outFromServer.writeUTF("[close]");
 			
 			// Close the server
 			connected.close();
 			end();
 			
 			System.out.println("Server has been closed");
-			
 		} 
 		
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public static void setState(float[] s) {
@@ -207,16 +169,17 @@ public class Server extends Thread {
 		return action;
 	}
 	
+	// NOT USED
 	public static void sendState() {
-		
 		System.out.println("Sending state...");
 		sendState = true;
 	}
 	
-	public void closeConnection() {
+	public static void closeConnection() {
 		open = false;
 	}
 	
+	// is this used?
 	public boolean isOpen() {
 		return open;
 	}
@@ -228,16 +191,6 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
-	//Close the python client safely
-	public String closeClient() {
-		String close = "[close]";
-		return close;
-	}
-	
-//	public void setmcServer(Object s) {
-//		mc = s;
-//	}
 	
 	public static void setMinecraft(Minecraft m) {
 		minecraft = m;

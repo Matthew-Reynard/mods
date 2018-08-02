@@ -21,6 +21,8 @@ public class Actions {
 	public static double startPitch;
 	public static boolean jumped = false;
 	
+	public static float speed = 0.04f;
+	
 	public Actions(EntityPlayer p){
 		player = p;
 	}
@@ -44,7 +46,7 @@ public class Actions {
 //		System.out.print("X:" + player.posX);
 //		System.out.println("\tStartX"+startXpos);
 		if (player.posX < startXpos + distanceToMove) {
-			player.setVelocity(0.07f, 0.0f, 0.0f);
+			player.setVelocity(speed, 0.0f, 0.0f);
 			actionComplete = false;
 			
 		}
@@ -62,7 +64,7 @@ public class Actions {
 //		System.out.print("X:" + player.posX);
 //		System.out.println("\tStartX"+startXpos);
 		if (player.posX > startXpos - distanceToMove) {
-			player.setVelocity(-0.07f, 0.0f, 0.0f);
+			player.setVelocity(-speed, 0.0f, 0.0f);
 			actionComplete = false;
 
 		}
@@ -80,7 +82,7 @@ public class Actions {
 //		System.out.print("Z:" + player.posZ);
 //		System.out.println("\tStartZ"+startZpos);
 		if (player.posZ > startZpos - distanceToMove) {
-			player.setVelocity(0.0f, 0.0f, -0.07f);
+			player.setVelocity(0.0f, 0.0f, -speed);
 			actionComplete = false;
 			
 		}
@@ -98,7 +100,7 @@ public class Actions {
 //		System.out.print("Z:" + player.posZ);
 //		System.out.println("\tStartZ"+startZpos);
 		if (player.posZ < startZpos + distanceToMove) {
-			player.setVelocity(0.0f, 0.0f, 0.07f);
+			player.setVelocity(0.0f, 0.0f, speed);
 			actionComplete = false;
 			
 		}
