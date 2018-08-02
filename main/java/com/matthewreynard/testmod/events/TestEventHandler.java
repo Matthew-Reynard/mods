@@ -76,6 +76,9 @@ public class TestEventHandler {
 	public static long currentTime = 0;
 	public static long numOfTicks = 0;
 	
+	// Used for a time limit
+	public static int numOfActions = 0;
+	
 	/**
 	 * Called every world tick
 	 * Can only be called when game is not paused,
@@ -97,7 +100,7 @@ public class TestEventHandler {
 			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY-1), Math.floor(mc.player.posZ));
 			
 			// if the agent is on a glass block -> RESET game (game over), next episode
-			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
+			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS || numOfActions >= 10) {
 				
 				// Resets player for new episode
 				resetPlayer(mc);
@@ -117,7 +120,7 @@ public class TestEventHandler {
 			
 			}
 			
-			else if (!Reference.isPerformingAction) {
+			if (!Reference.isPerformingAction && !Reference.isEpisodeDone) {
 				
 				// If the agent is on the food block -> Update to new food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
@@ -176,34 +179,34 @@ public class TestEventHandler {
 				switch(action) {
 					case 1: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
-//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
-						
-						Reference.isPerformingAction = act.moveForward();
+						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
+						numOfActions++;
+//						Reference.isPerformingAction = act.moveForward();
 						break;
 					
 					case 0: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
-//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
-						
-						Reference.isPerformingAction = act.moveBackward();
+						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
+						numOfActions++;
+//						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
 					case 2: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
-//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
-						
-						Reference.isPerformingAction = act.moveLeft();
+						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
+						numOfActions++;
+//						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
 					case 3: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
-//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
-						
-						Reference.isPerformingAction = act.moveRight();
+						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
+						numOfActions++;
+//						Reference.isPerformingAction = act.moveRight();
 						break;
 						
 					case 4: //jump forward
@@ -678,6 +681,7 @@ public class TestEventHandler {
 	 * @param null 
 	 */
 	public void resetPlayer(Minecraft mc) {
+		
 		Log.info("RESET");
 		
 		// reset the players position to these random locations
@@ -713,6 +717,9 @@ public class TestEventHandler {
 		// sets the action to do nothing
 		action = -1;
 		Server.setAction("-1");
+		
+		// Used for a time limit
+		numOfActions = 0;
 		
 	}
 

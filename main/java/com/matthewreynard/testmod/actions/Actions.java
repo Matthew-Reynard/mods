@@ -21,7 +21,7 @@ public class Actions {
 	public static double startPitch;
 	public static boolean jumped = false;
 	
-	public static float speed = 0.04f;
+	public static float speed = 0.07f;
 	
 	public Actions(EntityPlayer p){
 		player = p;
