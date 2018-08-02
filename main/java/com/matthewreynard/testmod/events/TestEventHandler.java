@@ -92,6 +92,9 @@ public class TestEventHandler {
 	{
 		Minecraft mc = Minecraft.getMinecraft();
 		Actions act = new Actions(mc.player);
+		Server.setMinecraft(mc);
+		
+		Reference.unpauseLimit = 0;
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
@@ -100,7 +103,9 @@ public class TestEventHandler {
 			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY-1), Math.floor(mc.player.posZ));
 			
 			// if the agent is on a glass block -> RESET game (game over), next episode
-			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS || numOfActions >= 10) {
+			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
+				
+				Server.setReward("-1");
 				
 				// Resets player for new episode
 				resetPlayer(mc);
@@ -111,16 +116,40 @@ public class TestEventHandler {
 				// Pauses so that the NN can update
 				try {
 					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
 					Robot robot = new Robot();
 					robot.keyPress(KeyEvent.VK_ESCAPE);
 					robot.keyRelease(KeyEvent.VK_ESCAPE);
 				} catch (AWTException e) {
 					e.printStackTrace();
 				}
+			}
 			
+			if(numOfActions >= 25) {
+				
+				Server.setReward("0");
+				
+				// Resets player for new episode
+				resetPlayer(mc);
+				
+				// the episode is done
+				Reference.setDone(true);
+				
+				// Pauses so that the NN can update
+				try {
+					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			if (!Reference.isPerformingAction && !Reference.isEpisodeDone) {
+				
+				Server.setReward("0");
 				
 				// If the agent is on the food block -> Update to new food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
@@ -134,6 +163,9 @@ public class TestEventHandler {
 		        	
 		        	prev_food_x = food_x;
 		        	prev_food_z = food_z;
+		        	
+		        	// Agent ate the food
+		        	Server.setReward("1");
 				}
 				
 				// Update state
@@ -151,6 +183,7 @@ public class TestEventHandler {
 				// Pause
 				try {
 					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
 					Robot robot = new Robot();
 					robot.keyPress(KeyEvent.VK_ESCAPE);
 					robot.keyRelease(KeyEvent.VK_ESCAPE);
@@ -508,7 +541,7 @@ public class TestEventHandler {
         {
         	
         	// Sends the Minecraft instance to the Server
-			Server.setMinecraft(mc);
+//			Server.setMinecraft(mc);
 			
         	// reset agent in random location, food random, action -1
         	resetPlayer(mc);      	

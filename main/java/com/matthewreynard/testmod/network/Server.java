@@ -26,6 +26,9 @@ public class Server extends Thread {
 	public static float[] state = {0,0,0,0}; 
 	public static int action = -1;
 	
+	// Needs to be a string to send it over the socket
+	public static String reward = "0";
+	
 	public static int port = 5555;
 	
 	public static Minecraft minecraft;
@@ -33,6 +36,9 @@ public class Server extends Thread {
 	public static ServerSocket server;
 	
 	public static boolean sendState = false;
+	
+	public static long pauseStartTime = 0;
+	public static long currentTime = 0;
 	
 	// Thread function
 	public void run() {
@@ -53,6 +59,8 @@ public class Server extends Thread {
 			
 			// Open the server
 			open = true;
+			
+			currentTime = System.currentTimeMillis();
 			
 //			while(open) {
 //				fromClient = inFromClient.readLine();
@@ -87,6 +95,25 @@ public class Server extends Thread {
 			
 			while(open) {
 				
+				if(minecraft.isGamePaused() && !Reference.isAwaitingAction && Reference.isTraining) {
+					
+//					Reference.unpauseLimit++;
+					currentTime = System.currentTimeMillis();
+					
+					if(currentTime-pauseStartTime >= 1000) {
+						//Unpause
+						try {
+							Log.info("UNPAUSE AGAIN");
+							pauseStartTime = System.currentTimeMillis();
+							Robot robot = new Robot();
+							robot.keyPress(KeyEvent.VK_ESCAPE);
+							robot.keyRelease(KeyEvent.VK_ESCAPE);
+						} catch (AWTException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
 				if(Reference.isAwaitingAction) {
 					
 					//Pause
@@ -105,7 +132,7 @@ public class Server extends Thread {
 						
 						if (Reference.isEpisodeDone) {
 							// sends done to python
-							outFromServer.writeUTF("[done]");
+							outFromServer.writeUTF("[done, " + reward + "]");
 							
 							// Start of a new episode (isEpisodeDone = false)
 							Reference.setDone(false);
@@ -113,7 +140,7 @@ public class Server extends Thread {
 						else {
 							
 							// sends the state of Minecraft agent to python
-							outFromServer.writeUTF(Arrays.toString(state));
+							outFromServer.writeUTF(Arrays.toString(state).replace("]",", " + reward + "]"));
 						
 							//Python decides action...
 							
@@ -167,6 +194,10 @@ public class Server extends Thread {
 	
 	public static int getAction() {
 		return action;
+	}
+	
+	public static void setReward(String r) {
+		reward = r;
 	}
 	
 	// NOT USED
