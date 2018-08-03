@@ -125,7 +125,7 @@ public class TestEventHandler {
 				}
 			}
 			
-			if(numOfActions >= 25) {
+			if(numOfActions >= 50) {
 				
 				Server.setReward("0");
 				
@@ -153,8 +153,34 @@ public class TestEventHandler {
 				
 				// If the agent is on the food block -> Update to new food block
 				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
-					food_x = rnd.nextInt(8);
-		        	food_z = rnd.nextInt(8);
+					
+					boolean made = false;
+					
+					while (!made) {
+						int rrr = rnd.nextInt(3);
+						if (rrr == 0) {
+							food_x = 1;
+					    	food_z = 5;
+						}
+						else if (rrr == 1) {
+							food_x = 6;
+					    	food_z = 6;
+						}
+						else if (rrr == 2) {
+							food_x = 5;
+					    	food_z = 1;
+						}
+						
+						if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
+							made = false;
+						}
+						else {
+							made = true;
+						}
+					}
+					
+//					food_x = rnd.nextInt(8);
+//		        	food_z = rnd.nextInt(8);
 		        	
 		        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
 		        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
@@ -168,11 +194,17 @@ public class TestEventHandler {
 		        	Server.setReward("1");
 				}
 				
-				// Update state
-				state[0]= (float)Math.floor(mc.player.posZ);
-				state[1]= (float)Math.floor(mc.player.posX);
-				state[2]= (float)food_z;
-				state[3]= (float)food_x;
+		    	// Update the agents state
+//				state[0]= (float)Math.floor(mc.player.posZ);
+//				state[1]= (float)Math.floor(mc.player.posX);
+//				state[2]= (float)food_z;
+//				state[3]= (float)food_x;
+				
+				// Update the agents state
+				state[0]= (float)Math.floor(mc.player.posX);
+				state[1]= (float)Math.floor(mc.player.posZ);
+				state[2]= (float)food_x;
+				state[3]= (float)food_z;
 				
 				// Doesn't require the server to be running
 				Server.setState(state);
@@ -210,7 +242,7 @@ public class TestEventHandler {
 //				Log.info("Action: " + Integer.toString(action) + "\n");
 				
 				switch(action) {
-					case 1: //forward
+					case 3: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
 						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
 						Reference.isPerformingAction = false;
@@ -218,7 +250,7 @@ public class TestEventHandler {
 //						Reference.isPerformingAction = act.moveForward();
 						break;
 					
-					case 0: //backward
+					case 2: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
 						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
 						Reference.isPerformingAction = false;
@@ -226,7 +258,7 @@ public class TestEventHandler {
 //						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
-					case 2: //left
+					case 0: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
 						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
 						Reference.isPerformingAction = false;
@@ -234,7 +266,7 @@ public class TestEventHandler {
 //						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
-					case 3: //right
+					case 1: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
 						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
 						Reference.isPerformingAction = false;
@@ -717,12 +749,39 @@ public class TestEventHandler {
 		
 		Log.info("RESET");
 		
-		// reset the players position to these random locations
-		mc.player.setLocationAndAngles(rnd.nextInt(8) + 0.5D, 101, rnd.nextInt(8) + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
+		// reset the players position to this location
+		mc.player.setLocationAndAngles(2 + 0.5D, 101, 2 + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
+//		mc.player.setLocationAndAngles(rnd.nextInt(8) + 0.5D, 101, rnd.nextInt(8) + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
 	
 		// randomizes the new foods location
-		food_x = rnd.nextInt(8);
-    	food_z = rnd.nextInt(8);
+		boolean made = false;
+		
+		while (!made) {
+			int rrr = rnd.nextInt(3);
+			if (rrr == 0) {
+				food_x = 1;
+		    	food_z = 5;
+			}
+			else if (rrr == 1) {
+				food_x = 6;
+		    	food_z = 6;
+			}
+			else if (rrr == 2) {
+				food_x = 5;
+		    	food_z = 1;
+			}
+			
+			//		food_x = rnd.nextInt(8);
+			//    	food_z = rnd.nextInt(8);
+			
+			if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
+				made = false;
+			}
+			else {
+				made = true;
+			}
+		}
+
     	
     	// Changes the new food to red wool and the old food back to wood
     	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
@@ -735,10 +794,16 @@ public class TestEventHandler {
     	prev_food_z = food_z;
 	
     	// Update the agents state
-		state[0]= (float)Math.floor(mc.player.posZ);
-		state[1]= (float)Math.floor(mc.player.posX);
-		state[2]= (float)food_z;
-		state[3]= (float)food_x;
+//		state[0]= (float)Math.floor(mc.player.posZ);
+//		state[1]= (float)Math.floor(mc.player.posX);
+//		state[2]= (float)food_z;
+//		state[3]= (float)food_x;
+		
+		// Update the agents state
+		state[0]= (float)Math.floor(mc.player.posX);
+		state[1]= (float)Math.floor(mc.player.posZ);
+		state[2]= (float)food_x;
+		state[3]= (float)food_z;
 		
 		// Doesn't require the server to be running
 		Server.setState(state);
