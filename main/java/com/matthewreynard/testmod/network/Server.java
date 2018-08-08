@@ -97,6 +97,9 @@ public class Server extends Thread {
 				
 				if(minecraft.isGamePaused() && !Reference.isAwaitingAction && Reference.isTraining) {
 					
+//					Reference.setAction(true);
+//					System.out.println(Reference.isEpisodeDone);
+					
 //					Reference.unpauseLimit++;
 					currentTime = System.currentTimeMillis();
 					
@@ -125,8 +128,8 @@ public class Server extends Thread {
 //						e.printStackTrace();
 //					}
 					
-//					if(!minecraft.isGamePaused()) { // THIS IS FOR RUNNING THE CNN IN MINECRAFT WITHOUT PAUSING... SMOOTH GAMEPLAY
-					if(minecraft.isGamePaused()) { // THIS IS FOR TRAINING
+					if(!minecraft.isGamePaused()) { // THIS IS FOR RUNNING THE CNN IN MINECRAFT WITHOUT PAUSING... SMOOTH GAMEPLAY
+//					if(minecraft.isGamePaused()) { // THIS IS FOR TRAINING
 						
 //							System.out.println("Sending state: " + Arrays.toString(state));
 						
@@ -135,7 +138,14 @@ public class Server extends Thread {
 							outFromServer.writeUTF("[done, " + reward + "]");
 							
 							// Start of a new episode (isEpisodeDone = false)
-							Reference.setDone(false);
+//							Reference.setDone(false);
+							
+							Reference.isEpisodeDone = false;
+							
+							// RUNNING
+//							while(Reference.isEpisodeDone) {
+//								Reference.setDone(false);
+//							}
 						}
 						else {
 							
@@ -151,14 +161,14 @@ public class Server extends Thread {
 						}
 						
 						//Unpause
-						try {
-							Log.info("UNPAUSE");
-							Robot robot = new Robot();
-							robot.keyPress(KeyEvent.VK_ESCAPE);
-							robot.keyRelease(KeyEvent.VK_ESCAPE);
-						} catch (AWTException e) {
-							e.printStackTrace();
-						}
+//						try {
+//							Log.info("UNPAUSE");
+//							Robot robot = new Robot();
+//							robot.keyPress(KeyEvent.VK_ESCAPE);
+//							robot.keyRelease(KeyEvent.VK_ESCAPE);
+//						} catch (AWTException e) {
+//							e.printStackTrace();
+//						}
 						
 //						minecraft.skipRenderWorld = true;
 						

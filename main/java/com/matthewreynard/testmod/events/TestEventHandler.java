@@ -105,7 +105,7 @@ public class TestEventHandler {
 			// if the agent is on a glass block -> RESET game (game over), next episode
 			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
 				
-				Server.setReward("-1");
+				Server.setReward("-10");
 				
 				// Resets player for new episode
 				resetPlayer(mc);
@@ -114,37 +114,40 @@ public class TestEventHandler {
 				Reference.setDone(true);
 				
 				// Pauses so that the NN can update
-				try {
-					Log.info("PAUSE");
-					Server.pauseStartTime = System.currentTimeMillis();
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_ESCAPE);
-					robot.keyRelease(KeyEvent.VK_ESCAPE);
-				} catch (AWTException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					Log.info("PAUSE");
+//					Server.pauseStartTime = System.currentTimeMillis();
+//					Robot robot = new Robot();
+//					robot.keyPress(KeyEvent.VK_ESCAPE);
+//					robot.keyRelease(KeyEvent.VK_ESCAPE);
+//				} catch (AWTException e) {
+//					e.printStackTrace();
+//				}
 			}
 			
-			if(numOfActions >= 50) {
+			if(numOfActions >= 15) {
 				
 				Server.setReward("0");
 				
+				if(mc.world.isRemote) {
+				
 				// Resets player for new episode
 				resetPlayer(mc);
+				}
 				
 				// the episode is done
 				Reference.setDone(true);
 				
 				// Pauses so that the NN can update
-				try {
-					Log.info("PAUSE");
-					Server.pauseStartTime = System.currentTimeMillis();
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_ESCAPE);
-					robot.keyRelease(KeyEvent.VK_ESCAPE);
-				} catch (AWTException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					Log.info("PAUSE");
+//					Server.pauseStartTime = System.currentTimeMillis();
+//					Robot robot = new Robot();
+//					robot.keyPress(KeyEvent.VK_ESCAPE);
+//					robot.keyRelease(KeyEvent.VK_ESCAPE);
+//				} catch (AWTException e) {
+//					e.printStackTrace();
+//				}
 			}
 			
 			if (!Reference.isPerformingAction && !Reference.isEpisodeDone) {
@@ -191,7 +194,7 @@ public class TestEventHandler {
 		        	prev_food_z = food_z;
 		        	
 		        	// Agent ate the food
-		        	Server.setReward("1");
+		        	Server.setReward("10");
 				}
 				
 		    	// Update the agents state
@@ -213,15 +216,15 @@ public class TestEventHandler {
 				Reference.setAction(true);
 
 				// Pause
-				try {
-					Log.info("PAUSE");
-					Server.pauseStartTime = System.currentTimeMillis();
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_ESCAPE);
-					robot.keyRelease(KeyEvent.VK_ESCAPE);
-				} catch (AWTException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					Log.info("PAUSE");
+//					Server.pauseStartTime = System.currentTimeMillis();
+//					Robot robot = new Robot();
+//					robot.keyPress(KeyEvent.VK_ESCAPE);
+//					robot.keyRelease(KeyEvent.VK_ESCAPE);
+//				} catch (AWTException e) {
+//					e.printStackTrace();
+//				}
 				
 				// Get the action number from the NN
 //				action = Server.getAction();
@@ -232,6 +235,8 @@ public class TestEventHandler {
 				Reference.isPerformingAction = true;
 				act.setPlayerPos(mc.player.posX, mc.player.posY, mc.player.posZ);
 	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
+	        	
+	        	numOfActions++;
 			}
 			
 			// If the game is unpaused and the agent has an action number from NN
@@ -239,39 +244,39 @@ public class TestEventHandler {
 				
 				action = Server.getAction();
 				
-//				Log.info("Action: " + Integer.toString(action) + "\n");
+				Log.info("Action: " + Integer.toString(action) + "\n");
 				
 				switch(action) {
-					case 3: //forward
+					case 0: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
-						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-						numOfActions++;
-//						Reference.isPerformingAction = act.moveForward();
+//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+//						numOfActions++;
+						Reference.isPerformingAction = act.moveForward();
 						break;
 					
-					case 2: //backward
+					case 1: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
-						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-						numOfActions++;
-//						Reference.isPerformingAction = act.moveBackward();
+//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+//						numOfActions++;
+						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
-					case 0: //left
+					case 2: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
-						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-						numOfActions++;
-//						Reference.isPerformingAction = act.moveLeft();
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+//						numOfActions++;
+						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
-					case 1: //right
+					case 3: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
-						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-						numOfActions++;
-//						Reference.isPerformingAction = act.moveRight();
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+//						numOfActions++;
+						Reference.isPerformingAction = act.moveRight();
 						break;
 						
 					case 4: //jump forward
@@ -387,8 +392,8 @@ public class TestEventHandler {
 					
 					// If the agent is on the food block
 					if (Math.floor(player.posX) == food_x && Math.floor(player.posZ) == food_z) {
-						food_x = rnd.nextInt(10);
-			        	food_z = rnd.nextInt(10);
+						food_x = rnd.nextInt(8);
+			        	food_z = rnd.nextInt(8);
 			        	
 			        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
 			        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
@@ -404,35 +409,35 @@ public class TestEventHandler {
 			        	prev_food_z = food_z;
 					}
 					
-					float[] x = new float[4];
-					
-					x[0]= (float)Math.floor(mc.player.posZ);
-					x[1]= (float)Math.floor(mc.player.posX);
-					x[2]= (float)food_z;
-					x[3]= (float)food_x;
+//					float[] x = new float[4];
+//					
+//					x[0]= (float)Math.floor(mc.player.posZ);
+//					x[1]= (float)Math.floor(mc.player.posX);
+//					x[2]= (float)food_z;
+//					x[3]= (float)food_x;
 					
 					// Doesn't require the server to be running
-					Server.setState(x);
-					Server.setMinecraft(mc);
+//					Server.setState(x);
+//					Server.setMinecraft(mc);
 					
-					if (!Reference.isPerformingAction && player.world.isRemote) {
-						System.out.println("Not performing action");
-						Server.sendState();
-						
-						try {
-							System.out.println("PAUSE");
-							Robot robot = new Robot();
-							robot.keyPress(KeyEvent.VK_ESCAPE);
-							robot.keyRelease(KeyEvent.VK_ESCAPE);
-						} catch (AWTException e) {
-							e.printStackTrace();
-						}
-						Reference.isPerformingAction = true;
-						System.out.println("After pause");
-					}
+//					if (!Reference.isPerformingAction && player.world.isRemote) {
+//						System.out.println("Not performing action");
+//						Server.sendState();
+//						
+//						try {
+//							System.out.println("PAUSE");
+//							Robot robot = new Robot();
+//							robot.keyPress(KeyEvent.VK_ESCAPE);
+//							robot.keyRelease(KeyEvent.VK_ESCAPE);
+//						} catch (AWTException e) {
+//							e.printStackTrace();
+//						}
+//						Reference.isPerformingAction = true;
+//						System.out.println("After pause");
+//					}
 					
 //					Server.sendState();
-					action = Server.getAction();
+//					action = Server.getAction();
 					
 					if (player.world.isRemote) {
 						System.out.println("\nAction: " + Integer.toString(action) + "\n");
@@ -514,16 +519,13 @@ public class TestEventHandler {
 				}
 				
 				// Allow flight when toggled if hand is empty
-				if (heldItem != null && heldItem.isEmpty()) {
-					player.capabilities.allowFlying = true;
-				}
-				else {
-					player.capabilities.allowFlying = false;
-				}
+//				if (heldItem != null && heldItem.isEmpty()) {
+//					player.capabilities.allowFlying = true;
+//				}
+//				else {
+//					player.capabilities.allowFlying = false;
+//				}
 
-			}
-			else {
-				player.capabilities.allowFlying = player.capabilities.isCreativeMode ? true : false;
 			}
 		}
 	}
@@ -611,7 +613,6 @@ public class TestEventHandler {
 		else if (Keybinds.left.isPressed()) {
 //			player.setLocationAndAngles(player.posX, player.posY, player.posZ - 1.0, player.rotationYaw, player.rotationPitch);
 			
-//			
         	action = 9;
         	Reference.isPerformingAction = true;
         	act.setPlayerPos(player.posX, player.posY, player.posZ);
@@ -747,7 +748,7 @@ public class TestEventHandler {
 	 */
 	public void resetPlayer(Minecraft mc) {
 		
-		Log.info("RESET");
+		Log.info("RESET ", numOfActions);
 		
 		// reset the players position to this location
 		mc.player.setLocationAndAngles(2 + 0.5D, 101, 2 + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
@@ -863,5 +864,7 @@ public class TestEventHandler {
  * 
  * NetworkHandler.sendToServer(new MessageExplode());
  * System.out.println("Some event called; is this the client side? " + event.getEntity().world.isRemote);
+ * 
+ * player.capabilities.allowFlying = player.capabilities.isCreativeMode ? true : false;
  * 
  * */
