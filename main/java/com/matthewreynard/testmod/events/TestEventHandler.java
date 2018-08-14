@@ -114,18 +114,18 @@ public class TestEventHandler {
 				Reference.setDone(true);
 				
 				// Pauses so that the NN can update
-//				try {
-//					Log.info("PAUSE");
-//					Server.pauseStartTime = System.currentTimeMillis();
-//					Robot robot = new Robot();
-//					robot.keyPress(KeyEvent.VK_ESCAPE);
-//					robot.keyRelease(KeyEvent.VK_ESCAPE);
-//				} catch (AWTException e) {
-//					e.printStackTrace();
-//				}
+				try {
+					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
 			}
 			
-			if(numOfActions >= 15) {
+			if(numOfActions >= 25) {
 				
 				Server.setReward("0");
 				
@@ -139,15 +139,15 @@ public class TestEventHandler {
 				Reference.setDone(true);
 				
 				// Pauses so that the NN can update
-//				try {
-//					Log.info("PAUSE");
-//					Server.pauseStartTime = System.currentTimeMillis();
-//					Robot robot = new Robot();
-//					robot.keyPress(KeyEvent.VK_ESCAPE);
-//					robot.keyRelease(KeyEvent.VK_ESCAPE);
-//				} catch (AWTException e) {
-//					e.printStackTrace();
-//				}
+				try {
+					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			if (!Reference.isPerformingAction && !Reference.isEpisodeDone) {
@@ -216,15 +216,15 @@ public class TestEventHandler {
 				Reference.setAction(true);
 
 				// Pause
-//				try {
-//					Log.info("PAUSE");
-//					Server.pauseStartTime = System.currentTimeMillis();
-//					Robot robot = new Robot();
-//					robot.keyPress(KeyEvent.VK_ESCAPE);
-//					robot.keyRelease(KeyEvent.VK_ESCAPE);
-//				} catch (AWTException e) {
-//					e.printStackTrace();
-//				}
+				try {
+					Log.info("PAUSE");
+					Server.pauseStartTime = System.currentTimeMillis();
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
 				
 				// Get the action number from the NN
 //				action = Server.getAction();
@@ -244,39 +244,39 @@ public class TestEventHandler {
 				
 				action = Server.getAction();
 				
-				Log.info("Action: " + Integer.toString(action) + "\n");
+//				Log.info("Action: " + Integer.toString(action) + "\n");
 				
 				switch(action) {
 					case 0: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
-//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
+						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
 //						numOfActions++;
-						Reference.isPerformingAction = act.moveForward();
+//						Reference.isPerformingAction = act.moveForward();
 						break;
 					
 					case 1: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
-//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
+						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
 //						numOfActions++;
-						Reference.isPerformingAction = act.moveBackward();
+//						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
 					case 2: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
-//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
+						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
 //						numOfActions++;
-						Reference.isPerformingAction = act.moveLeft();
+//						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
 					case 3: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
-//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-//						Reference.isPerformingAction = false;
+						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+						Reference.isPerformingAction = false;
 //						numOfActions++;
-						Reference.isPerformingAction = act.moveRight();
+//						Reference.isPerformingAction = act.moveRight();
 						break;
 						
 					case 4: //jump forward
