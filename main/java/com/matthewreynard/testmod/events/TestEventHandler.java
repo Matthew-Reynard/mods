@@ -87,14 +87,12 @@ public class TestEventHandler {
 	 * @param event
 	 */
 	
-	@SubscribeEvent
-	public void worldTick(WorldTickEvent event)
+//	@SubscribeEvent
+	public void training(WorldTickEvent event)
 	{
 		Minecraft mc = Minecraft.getMinecraft();
 		Actions act = new Actions(mc.player);
 		Server.setMinecraft(mc);
-		
-		Reference.unpauseLimit = 0;
 		
 		if(Reference.isTraining && mc.player.world.isRemote) {
 			
@@ -125,7 +123,7 @@ public class TestEventHandler {
 				}
 			}
 			
-			if(numOfActions >= 25) {
+			if(numOfActions >= 50) {
 				
 				Server.setReward("0");
 				
@@ -160,19 +158,23 @@ public class TestEventHandler {
 					boolean made = false;
 					
 					while (!made) {
-						int rrr = rnd.nextInt(3);
-						if (rrr == 0) {
-							food_x = 1;
-					    	food_z = 5;
-						}
-						else if (rrr == 1) {
-							food_x = 6;
-					    	food_z = 6;
-						}
-						else if (rrr == 2) {
-							food_x = 5;
-					    	food_z = 1;
-						}
+						
+						food_x = rnd.nextInt(8);
+			        	food_z = rnd.nextInt(8);
+						
+//						int rrr = rnd.nextInt(3);
+//						if (rrr == 0) {
+//							food_x = 1;
+//					    	food_z = 5;
+//						}
+//						else if (rrr == 1) {
+//							food_x = 6;
+//					    	food_z = 6;
+//						}
+//						else if (rrr == 2) {
+//							food_x = 5;
+//					    	food_z = 1;
+//						}
 						
 						if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
 							made = false;
@@ -181,9 +183,6 @@ public class TestEventHandler {
 							made = true;
 						}
 					}
-					
-//					food_x = rnd.nextInt(8);
-//		        	food_z = rnd.nextInt(8);
 		        	
 		        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
 		        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
@@ -249,34 +248,34 @@ public class TestEventHandler {
 				switch(action) {
 					case 0: //forward
 //						System.out.println("\nAction: "+action+" -> UP");
-						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-//						numOfActions++;
-//						Reference.isPerformingAction = act.moveForward();
+//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveForward();
 						break;
 					
 					case 1: //backward
 //						System.out.println("\nAction: "+action+" -> DOWN"); 
-						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-//						numOfActions++;
-//						Reference.isPerformingAction = act.moveBackward();
+//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveBackward();
 						break;
 					
 					case 2: //left
 //						System.out.println("\nAction: "+action+" -> LEFT");
-						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-//						numOfActions++;
-//						Reference.isPerformingAction = act.moveLeft();
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveLeft();
 						break;
 					
 					case 3: //right
 //						System.out.println("\nAction: "+action+" -> RIGHT");							
-						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
-						Reference.isPerformingAction = false;
-//						numOfActions++;
-//						Reference.isPerformingAction = act.moveRight();
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveRight();
 						break;
 						
 					case 4: //jump forward
@@ -328,6 +327,217 @@ public class TestEventHandler {
 //						System.out.println("Invalid action - do nothing");
 						Reference.isPerformingAction = false;
 				}
+			}
+		}
+	}
+	
+	/**
+	 * Called every world tick - Used for runnning the mini snake game
+	 * Can only be called when game is not paused,
+	 * BUG: Might be called while the game is pausing... not sure yet
+	 * 
+	 * @param event
+	 */
+	
+	@SubscribeEvent
+	public void running(WorldTickEvent event)
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		Actions act = new Actions(mc.player);
+		Server.setMinecraft(mc);
+		
+		if(Reference.isTraining && mc.player.world.isRemote) {
+			
+			BlockPos blockpos = new BlockPos(Math.floor(mc.player.posX), Math.floor(mc.player.posY-1), Math.floor(mc.player.posZ));
+			
+			// if the agent is on a glass block -> RESET game (game over), next episode
+			if(mc.world.getBlockState(blockpos).getMaterial() == Material.GLASS) {
+				
+				// Resets player for new episode
+				resetPlayer(mc);
+				
+				// the episode is done
+				Reference.setDone(true);
+				
+				// Pauses so that the NN can update
+
+			}
+			
+			if(numOfActions >= 50) {
+				
+				// Resets player for new episode
+				resetPlayer(mc);
+				
+				// the episode is done
+				Reference.setDone(true);
+				
+				// Pauses so that the NN can update
+			}
+			
+			if (!Reference.isPerformingAction && !Reference.isEpisodeDone) {
+				
+				// If the agent is on the food block -> Update to new food block
+				if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
+					
+					boolean made = false;
+					
+					while (!made) {
+						
+						food_x = rnd.nextInt(8);
+			        	food_z = rnd.nextInt(8);
+						
+//						int rrr = rnd.nextInt(3);
+//						if (rrr == 0) {
+//							food_x = 1;
+//					    	food_z = 5;
+//						}
+//						else if (rrr == 1) {
+//							food_x = 6;
+//					    	food_z = 6;
+//						}
+//						else if (rrr == 2) {
+//							food_x = 5;
+//					    	food_z = 1;
+//						}
+						
+						if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
+							made = false;
+						}
+						else {
+							made = true;
+						}
+					}
+		        	
+		        	IBlockState state_red = mc.world.getBlockState(new BlockPos(0,99,0));
+		        	IBlockState state_wood = mc.world.getBlockState(new BlockPos(0,98,0));
+		        	mc.world.setBlockState(new BlockPos(prev_food_x,100,prev_food_z), state_wood);
+		        	mc.world.setBlockState(new BlockPos(food_x,100,food_z), state_red);
+		        	
+		        	prev_food_x = food_x;
+		        	prev_food_z = food_z;
+				}
+				
+				// Update the agents state
+				state[0]= (float)Math.floor(mc.player.posX);
+				state[1]= (float)Math.floor(mc.player.posZ);
+				state[2]= (float)food_x;
+				state[3]= (float)food_z;
+				
+				// Doesn't require the server to be running
+				Server.setState(state);
+				
+				// Agent is waiting for an action command from NN
+				Reference.setAction(true);
+
+				// Pause
+				
+				// Get the action number from the NN
+//				action = Server.getAction();
+	
+//				Log.info("Action: " + Integer.toString(action) + "\n");
+				
+				// Agent is now set to be performing an action
+				Reference.isPerformingAction = true;
+				act.setPlayerPos(mc.player.posX, mc.player.posY, mc.player.posZ);
+	        	act.setPlayerAngles(mc.player.rotationYaw, mc.player.rotationPitch);
+	        	
+	        	numOfActions++;
+			}
+			
+			// If the game is unpaused and the agent has an action number from NN
+			if(!Reference.isAwaitingAction && !Reference.isEpisodeDone) {
+				
+				action = Server.getAction();
+				
+//				Log.info("Action: " + Integer.toString(action) + "\n");
+				
+				switch(action) {
+					case 0: //forward
+//						System.out.println("\nAction: "+action+" -> UP");
+//						mc.player.setLocationAndAngles(mc.player.posX + 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveForward();
+						break;
+					
+					case 1: //backward
+//						System.out.println("\nAction: "+action+" -> DOWN"); 
+//						mc.player.setLocationAndAngles(mc.player.posX - 1.0, mc.player.posY, mc.player.posZ, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveBackward();
+						break;
+					
+					case 2: //left
+//						System.out.println("\nAction: "+action+" -> LEFT");
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ - 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveLeft();
+						break;
+					
+					case 3: //right
+//						System.out.println("\nAction: "+action+" -> RIGHT");							
+//						mc.player.setLocationAndAngles(mc.player.posX, mc.player.posY, mc.player.posZ + 1.0, mc.player.rotationYaw, mc.player.rotationPitch);
+//						Reference.isPerformingAction = false;
+
+						Reference.isPerformingAction = act.moveRight();
+						break;
+						
+					case 4: //jump forward
+//						System.out.println("\nAction: "+action+" -> JUMP FORWARD");
+						Reference.isPerformingAction = act.jumpForward();
+						break;
+						
+					case 5: //break block forward
+//						System.out.println("\nAction: "+action+" -> BREAK BLOCK FORWARD");
+						Reference.isPerformingAction = act.breakBlock();
+						break;
+						
+					case 6: //place block forward
+//						System.out.println("\nAction: "+action+" -> PLACE BLOCK FORWARD");
+						Reference.isPerformingAction = act.placeBlock();
+						break;
+					
+					case 7: //look up
+//						System.out.println("\nAction: "+action+" -> LOOK UP");
+						Reference.isPerformingAction = act.lookUp();
+						break;
+						
+					case 8: //look down
+//						System.out.println("\nAction: "+action+" -> LOOK DOWN");
+						Reference.isPerformingAction = act.lookDown();
+						break;
+					
+					case 9: //look left
+//						System.out.println("\nAction: "+action+" -> LOOK LEFT");
+						Reference.isPerformingAction = act.lookLeft();
+						break;
+						
+					case 10: //look right
+//						System.out.println("\nAction: "+action+" -> LOOK RIGHT");
+						Reference.isPerformingAction = act.lookRight();
+						break;
+						
+					case 11: //jump and place block below
+//						System.out.println("\nAction: "+action+" -> JUMP AND PLACE");
+						Reference.isPerformingAction = act.jumpAndPlaceBlock();
+						break;
+						
+					case 12: //look north
+//						System.out.println("\nAction: "+action+" -> LOOK NORTH");
+						Reference.isPerformingAction = act.lookNorth();
+						break;
+					
+					default: 
+//						System.out.println("Invalid action - do nothing");
+						Reference.isPerformingAction = false;
+				}
+			}
+			
+			// To ensure sync
+			if (Reference.isEpisodeDone) {
+				resetPlayer(mc);
 			}
 		}
 	}
@@ -707,6 +917,7 @@ public class TestEventHandler {
 		}
 	}
 	
+	
 	/**
 	 * Network event
 	 * Not used at the moment
@@ -735,6 +946,7 @@ public class TestEventHandler {
 	 * @param s
 	 * An instance of the Server class 
 	 */
+	
 	public void getServer(Server s) {
 //		server = s;
 	}
@@ -746,34 +958,36 @@ public class TestEventHandler {
 	 * 
 	 * @param null 
 	 */
+	
 	public void resetPlayer(Minecraft mc) {
 		
 		Log.info("RESET ", numOfActions);
 		
 		// reset the players position to this location
-		mc.player.setLocationAndAngles(2 + 0.5D, 101, 2 + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
-//		mc.player.setLocationAndAngles(rnd.nextInt(8) + 0.5D, 101, rnd.nextInt(8) + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
+//		mc.player.setLocationAndAngles(2 + 0.5D, 101, 2 + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
+		mc.player.setLocationAndAngles(rnd.nextInt(8) + 0.5D, 101, rnd.nextInt(8) + 0.5D, mc.player.rotationYaw, mc.player.rotationPitch);
 	
 		// randomizes the new foods location
 		boolean made = false;
 		
 		while (!made) {
-			int rrr = rnd.nextInt(3);
-			if (rrr == 0) {
-				food_x = 1;
-		    	food_z = 5;
-			}
-			else if (rrr == 1) {
-				food_x = 6;
-		    	food_z = 6;
-			}
-			else if (rrr == 2) {
-				food_x = 5;
-		    	food_z = 1;
-			}
 			
-			//		food_x = rnd.nextInt(8);
-			//    	food_z = rnd.nextInt(8);
+			food_x = rnd.nextInt(8);
+			food_z = rnd.nextInt(8);
+			   
+//			int rrr = rnd.nextInt(3);
+//			if (rrr == 0) {
+//				food_x = 1;
+//		    	food_z = 5;
+//			}
+//			else if (rrr == 1) {
+//				food_x = 6;
+//		    	food_z = 6;
+//			}
+//			else if (rrr == 2) {
+//				food_x = 5;
+//		    	food_z = 1;
+//			}
 			
 			if (Math.floor(mc.player.posX) == food_x && Math.floor(mc.player.posZ) == food_z) {
 				made = false;

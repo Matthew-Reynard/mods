@@ -17,7 +17,7 @@ public class Reference {
 	public static boolean isEpisodeDone = false;
 	public static int actionCount = 0;
 	
-	public static int unpauseLimit = 0;
+	public static int unpauseLimit = 0; // not used
 	
 	public static synchronized void setAction(boolean x) {
 		isAwaitingAction = x;
