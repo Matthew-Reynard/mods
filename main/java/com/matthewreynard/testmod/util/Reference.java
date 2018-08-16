@@ -10,7 +10,7 @@ public class Reference {
 	public static final String COMMON_PROXY_CLASS = "com.matthewreynard.testmod.proxy.CommonProxy";
 	
 	//Useful global variables
-	public static boolean isTraining = false;
+	public static volatile boolean isTraining = false;
 //	public static boolean isSending = true;
 	public static volatile boolean isAwaitingAction = false;
 	public static boolean isPerformingAction = false; 

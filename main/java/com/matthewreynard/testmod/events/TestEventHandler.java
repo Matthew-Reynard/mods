@@ -339,7 +339,7 @@ public class TestEventHandler {
 	 * @param event
 	 */
 	
-	@SubscribeEvent
+//	@SubscribeEvent
 	public void running(WorldTickEvent event)
 	{
 		Minecraft mc = Minecraft.getMinecraft();
@@ -541,6 +541,28 @@ public class TestEventHandler {
 			}
 		}
 	}
+	
+	//BENCHMARK TEST
+	@SubscribeEvent
+	public void benchmark(WorldTickEvent event)
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		Actions act = new Actions(mc.player);
+		Server.setMinecraft(mc);
+		
+		if(!mc.isGamePaused() && Reference.isTraining) {
+			
+			System.out.println("Pausing");
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ESCAPE);
+				robot.keyRelease(KeyEvent.VK_ESCAPE);
+			} catch (AWTException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	
 	/**
 	 * DEACTIVATED EVENT - In order to re-enable it, uncomment the @SubscribeEvent line above function

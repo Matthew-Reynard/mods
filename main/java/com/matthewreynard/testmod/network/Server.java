@@ -23,7 +23,8 @@ import net.minecraft.world.World;
 public class Server extends Thread {
 	
 	public static final boolean TRAINING = false;
-	public static final boolean RUNNING = true; 
+	public static final boolean RUNNING = false; 
+	public static final boolean BENCHMARKING = true;
 	
 	public static boolean open = false;
 	public static float[] state = {0,0,0,0}; 
@@ -44,7 +45,16 @@ public class Server extends Thread {
 	// Threads main function
 	public void run() {
 		
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
 		String fromClient;
+		
+//		Reference.isTraining = true;
 		
 		try {
 			server = new ServerSocket(port);
@@ -198,6 +208,34 @@ public class Server extends Thread {
 					}
 				}
 			}
+			
+			/**
+			 * Benchmark testing
+			 */
+			
+			if (BENCHMARKING) {
+				
+				for(int i = 0; i < 10000; i++) {
+					
+					System.out.println(minecraft.isGamePaused());
+					
+					if(minecraft.isGamePaused() && Reference.isTraining) { 
+						
+						System.out.println("Unpausing");
+						
+						//Unpause
+						try {
+							Robot robot = new Robot();
+							robot.keyPress(KeyEvent.VK_ESCAPE);
+							robot.keyRelease(KeyEvent.VK_ESCAPE);
+						} catch (AWTException e) {
+							e.printStackTrace();
+						}
+						
+					}
+				}
+			}
+			
 			
 			//Close the python client safely
 			outFromServer.writeUTF("[close]");
