@@ -215,24 +215,41 @@ public class Server extends Thread {
 			
 			if (BENCHMARKING) {
 				
-				for(int i = 0; i < 10000; i++) {
+				while(open) {
 					
-					System.out.println(minecraft.isGamePaused());
+//					System.out.println("hi");
 					
-					if(minecraft.isGamePaused() && Reference.isTraining) { 
+					if(Reference.isAwaitingAction) {
+				
+//						for(int i = 0; i < 10000; i++) {
+							
+//							System.out.println(minecraft.isGamePaused());
+							
+							if(minecraft.isGamePaused()) { 
+								
+//								System.out.println("Unpausing");
+								
+								//Unpause
+								try {
+									Robot robot = new Robot();
+									robot.keyPress(KeyEvent.VK_ESCAPE);
+									robot.keyRelease(KeyEvent.VK_ESCAPE);
+								} catch (AWTException e) {
+									e.printStackTrace();
+								}
+								Reference.setAction(false);
+								
+							}
+							
+//							else {
+//								i--;
+//							}
+//						}
 						
-						System.out.println("Unpausing");
-						
-						//Unpause
-						try {
-							Robot robot = new Robot();
-							robot.keyPress(KeyEvent.VK_ESCAPE);
-							robot.keyRelease(KeyEvent.VK_ESCAPE);
-						} catch (AWTException e) {
-							e.printStackTrace();
-						}
-						
+//						Reference.setAction(false);
+					
 					}
+				
 				}
 			}
 			

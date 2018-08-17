@@ -550,9 +550,16 @@ public class TestEventHandler {
 		Actions act = new Actions(mc.player);
 		Server.setMinecraft(mc);
 		
-		if(!mc.isGamePaused() && Reference.isTraining) {
+		if (Reference.i >= 100 && Reference.isTraining) {
+			Reference.isTraining = false;
+			ITextComponent msg = new TextComponentString("Time: ");
+			mc.player.sendMessage(msg.appendText(Long.toString(System.currentTimeMillis() - startTime)));
+			System.out.println("Time: " + (System.currentTimeMillis() - startTime));
+		}
+		
+		if(!mc.isGamePaused() && Reference.isTraining && !Reference.isAwaitingAction) {
 			
-			System.out.println("Pausing");
+//			System.out.println("Pausing");
 			try {
 				Robot robot = new Robot();
 				robot.keyPress(KeyEvent.VK_ESCAPE);
@@ -560,7 +567,10 @@ public class TestEventHandler {
 			} catch (AWTException e) {
 				e.printStackTrace();
 			}
+			Reference.increment();
+			Reference.setAction(true);
 		}
+		
 	}
 	
 	
@@ -810,10 +820,12 @@ public class TestEventHandler {
 //			Server.setMinecraft(mc);
 			
         	// reset agent in random location, food random, action -1
-        	resetPlayer(mc);      	
+//        	resetPlayer(mc);      	
         	
 			//Begins training
         	Reference.isTraining = true;
+        	startTime = System.currentTimeMillis();
+//        	Reference.setAction(true);
         	
         }
         

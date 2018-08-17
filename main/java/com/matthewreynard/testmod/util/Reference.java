@@ -16,6 +16,7 @@ public class Reference {
 	public static boolean isPerformingAction = false; 
 	public static boolean isEpisodeDone = false;
 	public static int actionCount = 0;
+	public static int i = 0;
 	
 	public static int unpauseLimit = 0; // not used
 	
@@ -33,6 +34,10 @@ public class Reference {
 	
 	public static void actionCountReset() {
 		actionCount = 0;
+	}
+	
+	public static synchronized void increment() {
+		i++;
 	}
 	
 }
